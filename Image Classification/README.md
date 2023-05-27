@@ -1,13 +1,14 @@
-# Image-Classification
-Image Classification by DeepLearning
+# Image Classification
 
 
-## 1. 项目说明
-### 1.0 更新日志
+## 更新日志
+**2023.5.27更新：**
+* 新增绘制F1图和混淆矩阵图
+* 优化代码
 **2023.5.25更新：**
 * 新建项目
 
-### 1.1 文件说明
+## 文件说明
 #### <pre>train.py</pre>
 训练程序
 > 可选参数：
