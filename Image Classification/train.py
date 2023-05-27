@@ -45,7 +45,7 @@ def parse_opt(known=False):
     # 可选参数
     parser.add_argument('--data_dir', type=str, default=ROOT / 'datasets', help='path to the data directory')
     parser.add_argument('--epochs', type=int, default=30, help='total training epochs')
-    parser.add_argument('--k', type=int, default=2, help='number of folds for k-fold cross validation')
+    parser.add_argument('--k', type=int, default=10, help='number of folds for k-fold cross validation')
     parser.add_argument('--batch_size', type=int, default=16, help='batch size for training and validation')
     parser.add_argument('--optimizer', type=str, choices=optimizer_list, default='Adam', help='optimizer')
     parser.add_argument('--lr', type=str, choices=lr_list, default='Fixed', help='learning rate')
