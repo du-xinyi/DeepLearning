@@ -28,10 +28,10 @@ def opt_yaml(opt, type, classes, steps, config, start_time, end_time, save_dir):
         yaml.dump(selected_params, file, sort_keys=False)
 
 
-def model_parameters(Loss, Accuracy, save_dir):
+def model_parameters(Train_Loss, Train_Accuracy, Val_Loss, Val_Accuracy, save_dir):
     with open(os.path.join(save_dir, 'result.csv'), 'w', newline='') as file:
         writer = csv.writer(file)
         writer.writerow(['epoch', 'accuracy', 'loss'])
 
-        for epoch, (loss, accuracy) in enumerate(zip(Loss, Accuracy)):
-            writer.writerow([epoch, loss, accuracy]) # 写入结果
+        for epoch, (train_loss, train_accuracy, val_loss, val_accuracy) in enumerate(zip(Train_Loss, Train_Accuracy, Val_Loss, Val_Accuracy)):
+            writer.writerow([epoch, train_loss, train_accuracy, val_loss, val_accuracy]) # 写入结果
