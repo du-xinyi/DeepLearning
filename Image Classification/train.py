@@ -4,7 +4,6 @@ import sys
 import os
 import yaml
 import time
-import matplotlib.pyplot as plt
 
 from pathlib import Path
 from utils.parameters import opt_yaml, model_parameters
@@ -12,6 +11,7 @@ from utils.dataloaders import DataLoaders
 from utils.model import net
 from utils.optimizer import optimizer
 from utils.loss import select_loss
+from utils.plot import plot_loss, plot_accuracy, plot_confusion_matrix, plot_f1_scores
 
 
 # 获取当前文件夹路径
@@ -21,14 +21,19 @@ if str(ROOT) not in sys.path:
     sys.path.append(str(ROOT))
 ROOT = Path(os.path.relpath(ROOT, Path.cwd()))
 
-optimizer_list = ['SGD', 'Adam', 'RMSprop']
-lr_list = ['Fixed', 'Cosine']
-loss_list = ['CrossEntropyLoss', 'NLLLoss', 'BCEWithLogitsLoss', 'BCELoss']
+optimizer_list = ['SGD', 'Adam', 'RMSprop'] # 优化器列表
+lr_list = ['Fixed', 'Cosine'] # 学习率列表
+loss_list = ['CrossEntropyLoss', 'NLLLoss', 'BCEWithLogitsLoss', 'BCELoss'] # 损失函数列表
 model_list = [
-        'resnet18','resnet34', 'resnet50', 'resnet101', 'resnet152']
+        'resnet18','resnet34', 'resnet50', 'resnet101', 'resnet152'] # 模型列表
 
-Loss = []
-Accuracy = []
+Train_Loss = [] # 训练过程的损失率
+Train_Accuracy = [] # 训练过程的准确率
+Val_Loss = [] # 验证过程的损失率
+Val_Accuracy = [] # 验证过程的准确率
+
+predictions = [] # 预测结果
+targets = [] # 真实标签
 
 counter = 1 # 计数器
 
@@ -40,7 +45,7 @@ def parse_opt(known=False):
     # 可选参数
     parser.add_argument('--data_dir', type=str, default=ROOT / 'datasets', help='path to the data directory')
     parser.add_argument('--epochs', type=int, default=30, help='total training epochs')
-    parser.add_argument('--k', type=int, default=10, help='number of folds for k-fold cross validation')
+    parser.add_argument('--k', type=int, default=2, help='number of folds for k-fold cross validation')
     parser.add_argument('--batch_size', type=int, default=16, help='batch size for training and validation')
     parser.add_argument('--optimizer', type=str, choices=optimizer_list, default='Adam', help='optimizer')
     parser.add_argument('--lr', type=str, choices=lr_list, default='Fixed', help='learning rate')
@@ -81,25 +86,25 @@ def main(opt):
     os.makedirs(save_dir)
 
     # 判断训练模式
-    if os.path.exists(opt.data_dir / 'train'):
+    if os.path.exists(os.path.join(opt.data_dir, 'train')):
         print("train-val validation")
         type = 'train_val'
-        classes = len([name for name in os.listdir(opt.data_dir / 'train')
+        num_classes = len([name for name in os.listdir(opt.data_dir / 'train')
                        if os.path.isdir(os.path.join(opt.data_dir / 'train', name))])
         steps = opt.epochs
     else:
         print("k-fold cross validation")
         type = 'k_fold'
-        classes = len([name for name in os.listdir(opt.data_dir)
+        num_classes = len([name for name in os.listdir(opt.data_dir)
                        if os.path.isdir(os.path.join(opt.data_dir, name))])
         steps = opt.k
 
     # 数据载入
     data_loaders = DataLoaders(opt.data_dir, opt.batch_size, opt.num_workers, type, opt.k, save_dir)
-    train_loaders, val_loaders, train_num, val_num = data_loaders.load_data()
+    train_loaders, val_loaders, train_num, val_num, class_list = data_loaders.load_data()
 
     # 网络载入
-    model = net(classes, opt.model, opt.device, opt.weights, opt.no_transfer_learning)
+    model = net(num_classes, opt.model, opt.device, opt.weights, opt.no_transfer_learning)
 
     # 优化器和学习率调度器载入
     optimize, schedule =optimizer(opt.optimizer, opt.lr, steps, config, model.parameters())
@@ -119,8 +124,11 @@ def main(opt):
     for epoch in range(steps):
         # train
         model.train()
-        running_loss = 0.0
-        step = 0
+
+        train_loss = 0.0
+        train_accuracy = 0.0
+        train_correct = 0
+        train_total = 0
 
         if type == 'k_fold':
             train_loader = train_loaders[epoch]
@@ -141,7 +149,13 @@ def main(opt):
             if schedule is not None:
                 schedule.step()
 
-            running_loss += loss.item()
+            # 计算训练损失和准确率
+            train_loss = loss.item()
+            _, predicted = torch.max(logits, 1)
+            train_correct += (predicted == labels.to(opt.device)).sum().item()
+            train_total += labels.size(0)
+            train_accuracy = train_correct / train_total
+
             rate = (step + 1) / len(train_loader)
             a = "*" * int(rate * 50)
             b = "." * int((1 - rate) * 50)
@@ -151,41 +165,52 @@ def main(opt):
         # validate
         model.eval()
         acc = 0.0
+
         with torch.no_grad():
             for val_data in val_loader:
                 val_images, val_labels = val_data
                 outputs = model(val_images.to(opt.device))
+                loss = loss_function(outputs, val_labels.to(opt.device))
                 predict_y = torch.max(outputs, dim=1)[1]
-                acc += (predict_y == val_labels.to(opt.device)).sum().item()
-            val_accurate = acc / val_num
 
+                acc += (predict_y == val_labels.to(opt.device)).sum().item()
+
+                val_loss = loss.item()
+                val_accurate = acc / val_num
+
+                # 保存预测结果和真实标签
+                predictions.extend(predict_y.tolist())
+                targets.extend(val_labels.tolist())
             # 保存模型
             if val_accurate > best_acc:
                 best_acc = val_accurate
                 torch.save(model.state_dict(), best_weight) # 最优模型
             torch.save(model.state_dict(), last_weight) # 最终模型
 
-            print('[epoch %d] train_loss: %.3f  test_accuracy: %.3f' %
-                  (epoch + 1, running_loss / step, val_accurate))
-            Loss.append(running_loss / step)
-            Accuracy.append(val_accurate)
-            model_parameters(Loss, Accuracy, save_dir)
+            print('[epoch %d] train_loss: %.3f  train_accuracy: %.3f  val_loss: %.3f  val_accuracy: %.3f' %
+                  (epoch + 1, train_loss, train_correct / train_total, val_loss, val_accurate))
+            Train_Loss.append(train_loss)
+            Train_Accuracy.append(train_accuracy)
+            Val_Loss.append(val_loss)
+            Val_Accuracy.append(val_accurate)
 
-    plt.subplot(2, 1, 1)
-    plt.plot(Loss)
-    plt.title('Loss')
-    plt.subplot(2, 1, 2)
-    plt.plot(Accuracy)
-    plt.title('Accuracy')
-    plt.subplots_adjust(hspace=0.5) # 增加垂直间距
-    plt.savefig(os.path.join(save_dir, 'result.jpg'))
-    plt.show()
+            model_parameters(Train_Loss, Train_Accuracy, Val_Loss, Val_Accuracy, save_dir) # 保存训练过程数据
+
+    # 绘制损失率和准确率
+    plot_loss(Train_Loss, Val_Loss, save_dir)
+    plot_accuracy(Train_Accuracy, Val_Accuracy, save_dir)
+
+    # 绘制混淆矩阵和颜色条
+    plot_confusion_matrix(targets, predictions, class_list, save_dir)
+
+    # 绘制F1图
+    plot_f1_scores(targets, predictions, class_list)
 
     # 结束时间
     end_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
 
     # 保存参数
-    opt_yaml(opt, type, classes, steps, config, start_time, end_time, save_dir)
+    opt_yaml(opt, type, num_classes, steps, config, start_time, end_time, save_dir)
 
     print('Finished Training')
 
