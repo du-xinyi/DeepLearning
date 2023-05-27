@@ -33,6 +33,11 @@ def class_indices(dataset, save_dir):
     with open(os.path.join(save_dir, 'class_indices.json'), 'w') as json_file:
         json_file.write(json_str)
 
+    # 返回类别列表
+    class_list = [cla_dict[i] for i in range(len(cla_dict))]
+
+    return class_list
+
 
 # 训练集数量
 def dataset_num(train_dataset, val_dataset):
@@ -84,7 +89,7 @@ class DataLoaders:
                                                  transform=data_transform["train"])
             val_dataset = datasets.ImageFolder(os.path.join(self.data_dir, "val"), transform=data_transform["val"])
 
-            class_indices(train_dataset, self.save_dir)
+            class_list = class_indices(train_dataset, self.save_dir)
 
             train_num, val_num = dataset_num(train_dataset, val_dataset)
 
@@ -97,7 +102,7 @@ class DataLoaders:
         elif self.type == 'k_fold':
             dataset = datasets.ImageFolder(self.data_dir)
 
-            class_indices(dataset, self.save_dir)
+            class_list = class_indices(dataset, self.save_dir)
 
             # 获取数据集的标签和样本数量
             labels = dataset.targets
@@ -125,7 +130,7 @@ class DataLoaders:
                 train_loaders.append(train_loader)
                 val_loaders.append(val_loader)
 
-        return train_loaders, val_loaders, train_num, val_num
+        return train_loaders, val_loaders, train_num, val_num, class_list
 
 
 class ImageTransform:
