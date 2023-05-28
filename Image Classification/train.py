@@ -44,15 +44,15 @@ def parse_opt(known=False):
 
     # 可选参数
     parser.add_argument('--data_dir', type=str, default=ROOT / 'datasets', help='path to the data directory')
-    parser.add_argument('--epochs', type=int, default=2, help='total training epochs')
-    parser.add_argument('--k', type=int, default=2, help='number of folds for k-fold cross validation')
+    parser.add_argument('--epochs', type=int, default=30, help='total training epochs')
+    parser.add_argument('--k', type=int, default=10, help='number of folds for k-fold cross validation')
     parser.add_argument('--batch_size', type=int, default=16, help='batch size for training and validation')
     parser.add_argument('--optimizer', type=str, choices=optimizer_list, default='Adam', help='optimizer')
     parser.add_argument('--lr', type=str, choices=lr_list, default='Fixed', help='learning rate')
     parser.add_argument('--loss', type=str, choices=loss_list, default='CrossEntropyLoss', help='loss function')
     parser.add_argument('--num_workers', type=int, default=min([os.cpu_count(), 8]),
                         help='number of worker threads for loading data')
-    parser.add_argument('--model', type=str, choices=model_list, default='resnet18',help='choose the network model')
+    parser.add_argument('--model', type=str, choices=model_list, default='resnet152',help='choose the network model')
     parser.add_argument('--weights', type=str, default='', help='initial weights path')
     parser.add_argument('--no_transfer_learning', action='store_false',
                         help='disable transfer learning')
