@@ -44,15 +44,15 @@ def parse_opt(known=False):
 
     # 可选参数
     parser.add_argument('--data_dir', type=str, default=ROOT / 'datasets', help='path to the data directory')
-    parser.add_argument('--epochs', type=int, default=30, help='total training epochs')
-    parser.add_argument('--k', type=int, default=10, help='number of folds for k-fold cross validation')
+    parser.add_argument('--epochs', type=int, default=2, help='total training epochs')
+    parser.add_argument('--k', type=int, default=2, help='number of folds for k-fold cross validation')
     parser.add_argument('--batch_size', type=int, default=16, help='batch size for training and validation')
     parser.add_argument('--optimizer', type=str, choices=optimizer_list, default='Adam', help='optimizer')
     parser.add_argument('--lr', type=str, choices=lr_list, default='Fixed', help='learning rate')
     parser.add_argument('--loss', type=str, choices=loss_list, default='CrossEntropyLoss', help='loss function')
     parser.add_argument('--num_workers', type=int, default=min([os.cpu_count(), 8]),
                         help='number of worker threads for loading data')
-    parser.add_argument('--model', type=str, choices=model_list, default='resnet152',help='choose the network model')
+    parser.add_argument('--model', type=str, choices=model_list, default='resnet18',help='choose the network model')
     parser.add_argument('--weights', type=str, default='', help='initial weights path')
     parser.add_argument('--no_transfer_learning', action='store_false',
                         help='disable transfer learning')
@@ -89,8 +89,8 @@ def main(opt):
     if os.path.exists(os.path.join(opt.data_dir, 'train')):
         print("train-val validation")
         type = 'train_val'
-        num_classes = len([name for name in os.listdir(opt.data_dir / 'train')
-                       if os.path.isdir(os.path.join(opt.data_dir / 'train', name))])
+        num_classes = len([name for name in os.listdir(os.path.join(opt.data_dir, 'train'))
+                       if os.path.isdir(os.path.join(os.path.join(opt.data_dir, 'train'), name))])
         steps = opt.epochs
     else:
         print("k-fold cross validation")
@@ -125,10 +125,10 @@ def main(opt):
         # train
         model.train()
 
-        train_loss = 0.0
-        train_accuracy = 0.0
+        running_loss = 0.0
         train_correct = 0
         train_total = 0
+        step = 0
 
         if type == 'k_fold':
             train_loader = train_loaders[epoch]
@@ -150,20 +150,22 @@ def main(opt):
                 schedule.step()
 
             # 计算训练损失和准确率
-            train_loss = loss.item()
+            running_loss += loss.item()
             _, predicted = torch.max(logits, 1)
             train_correct += (predicted == labels.to(opt.device)).sum().item()
             train_total += labels.size(0)
-            train_accuracy = train_correct / train_total
 
             rate = (step + 1) / len(train_loader)
             a = "*" * int(rate * 50)
             b = "." * int((1 - rate) * 50)
             print("\rtrain loss: {:^3.0f}%[{}->{}]{:.4f}".format(int(rate * 100), a, b, loss), end="")
         print()
+        train_loss = running_loss / step
+        train_accuracy = train_correct / train_total
 
         # validate
         model.eval()
+        running_loss = 0.0
         acc = 0.0
 
         with torch.no_grad():
@@ -173,14 +175,14 @@ def main(opt):
                 loss = loss_function(outputs, val_labels.to(opt.device))
                 predict_y = torch.max(outputs, dim=1)[1]
 
+                running_loss += loss.item()
                 acc += (predict_y == val_labels.to(opt.device)).sum().item()
-
-                val_loss = loss.item()
-                val_accurate = acc / val_num
 
                 # 保存预测结果和真实标签
                 predictions.extend(predict_y.tolist())
                 targets.extend(val_labels.tolist())
+            val_loss = running_loss / step
+            val_accurate = acc / val_num
             # 保存模型
             if val_accurate > best_acc:
                 best_acc = val_accurate
@@ -188,7 +190,7 @@ def main(opt):
             torch.save(model.state_dict(), last_weight) # 最终模型
 
             print('[epoch %d] train_loss: %.3f  train_accuracy: %.3f  val_loss: %.3f  val_accuracy: %.3f' %
-                  (epoch + 1, train_loss, train_correct / train_total, val_loss, val_accurate))
+                  (epoch + 1, train_loss, train_accuracy, val_loss, val_accurate))
             Train_Loss.append(train_loss)
             Train_Accuracy.append(train_accuracy)
             Val_Loss.append(val_loss)
@@ -204,7 +206,7 @@ def main(opt):
     plot_confusion_matrix(targets, predictions, class_list, save_dir)
 
     # 绘制F1图
-    plot_f1_scores(targets, predictions, class_list)
+    plot_f1_scores(targets, predictions, class_list, save_dir)
 
     # 结束时间
     end_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
