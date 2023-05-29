@@ -12,7 +12,7 @@ def plot_loss(Train_Loss, Val_Loss, save_dir):
     plt.ylabel("Loss")
     plt.title('Loss')
     plt.legend()
-    plt.savefig(os.path.join(save_dir, 'loss.jpg'))
+    plt.savefig(os.path.join(save_dir, 'loss.jpg'), bbox_inches='tight')
     plt.show()
 
 
@@ -23,7 +23,7 @@ def plot_accuracy(Train_Accuracy, Val_Accuracy, save_dir):
     plt.ylabel("Accuracy")
     plt.title('Accuracy')
     plt.legend()
-    plt.savefig(os.path.join(save_dir, 'accuracy.jpg'))
+    plt.savefig(os.path.join(save_dir, 'accuracy.jpg'), bbox_inches='tight')
     plt.show()
 
 
@@ -55,7 +55,7 @@ def plot_confusion_matrix(targets, predictions, class_list, save_dir):
     cbar.set_ticks(np.arange(min_value, max_value + 1, step_size))
     cbar.set_ticklabels(np.arange(min_value, max_value + 1, step_size))
 
-    plt.savefig(os.path.join(save_dir, 'confusion_matrix.png'))
+    plt.savefig(os.path.join(save_dir, 'confusion_matrix.png'), bbox_inches='tight')
     plt.show()
 
 
@@ -75,5 +75,5 @@ def plot_f1_scores(targets, predictions, class_list, save_dir):
     plt.xticks(np.arange(num_classes) + 0.5, range(num_classes), rotation=45, ha='right')
     plt.grid(True)
 
-    plt.savefig(os.path.join(save_dir, 'f1_Score.jpg'))
+    plt.savefig(os.path.join(save_dir, 'f1_Score.jpg'), bbox_inches='tight')
     plt.show()
