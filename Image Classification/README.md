@@ -2,9 +2,13 @@
 
 
 ## 更新日志
+**2023.5.29更新：**
+* 新增ResNeXt模型
+
 **2023.5.27更新：**
 * 新增绘制F1图和混淆矩阵图
 * 优化代码
+
 **2023.5.25更新：**
 * 新建项目
 
@@ -22,7 +26,8 @@
 --loss: 损失函数，可选['CrossEntropyLoss', 'NLLLoss', 'BCEWithLogitsLoss', 'BCELoss']，默认为CrossEntropyLoss
 --num_workers: 数据载入线程数量，默认为cpu核心数和8之间最小值
 --model: 网络类型，可选
-    ['resnet18','resnet34', 'resnet50', 'resnet101', 'resnet152']
+    ['resnet18','resnet34', 'resnet50', 'resnet101', 'resnet152',
+     'resnext50_32x4d', 'resnext101_32x8d', 'resnext101_32x16d']
 --weights: 预训练权重，默认不设置，自动选择为使用网络的预训练权重
 --no_transfer_learning: 是否使用迁移学习，默认为使用，调用则不使用迁移学习
 --device: 设备类型，在支持cuda时使用gpu，否则使用cpu
