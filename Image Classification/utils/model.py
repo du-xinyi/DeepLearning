@@ -4,6 +4,7 @@ import torch
 import torch.nn as nn
 
 from models.resnet import resnet18, resnet34, resnet50, resnet101, resnet152
+from models.resnext import resnext50_32x4d, resnext101_32x8d, resnext101_32x16d
 
 
 # 模型名称
@@ -12,7 +13,10 @@ model_dict = {
     'resnet34': resnet34,
     'resnet50': resnet50,
     'resnet101': resnet101,
-    'resnet152': resnet152
+    'resnet152': resnet152,
+    'resnext50_32x4d': resnext50_32x4d,
+    'resnext101_32x8d': resnext101_32x8d,
+    'resnext101_32x16d': resnext101_32x16d
 }
 
 # 预训练权重下载地址
@@ -22,6 +26,9 @@ model_urls = {
     'resnet50': 'https://download.pytorch.org/models/resnet50-19c8e357.pth',
     'resnet101': 'https://download.pytorch.org/models/resnet101-5d3b4d8f.pth',
     'resnet152': 'https://download.pytorch.org/models/resnet152-b121ed2d.pth',
+    'resnext50_32x4d': 'https://download.pytorch.org/models/resnext50_32x4d-7cdf4587.pth',
+    'resnext101_32x8d': 'https://download.pytorch.org/models/resnext101_32x8d-8ba56ff5.pth',
+    'resnext101_32x16d': 'https://download.pytorch.org/models/ig_resnext101_32x16-c6f796b0.pth'
 }
 
 # 下载预训练权重

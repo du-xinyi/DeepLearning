@@ -25,7 +25,8 @@ optimizer_list = ['SGD', 'Adam', 'RMSprop'] # 优化器列表
 lr_list = ['Fixed', 'Cosine'] # 学习率列表
 loss_list = ['CrossEntropyLoss', 'NLLLoss', 'BCEWithLogitsLoss', 'BCELoss'] # 损失函数列表
 model_list = [
-        'resnet18','resnet34', 'resnet50', 'resnet101', 'resnet152'] # 模型列表
+    'resnet18','resnet34', 'resnet50', 'resnet101', 'resnet152',
+    'resnext50_32x4d', 'resnext101_32x8d', 'resnext101_32x16d'] # 模型列表
 
 Train_Loss = [] # 训练过程的损失率
 Train_Accuracy = [] # 训练过程的准确率
