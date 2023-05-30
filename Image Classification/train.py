@@ -26,7 +26,7 @@ lr_list = ['Fixed', 'Cosine'] # 学习率列表
 loss_list = ['CrossEntropyLoss', 'NLLLoss', 'BCEWithLogitsLoss', 'BCELoss'] # 损失函数列表
 model_list = [
     'resnet18','resnet34', 'resnet50', 'resnet101', 'resnet152',
-    'resnext50_32x4d', 'resnext101_32x8d', 'resnext101_32x16d'] # 模型列表
+    'resnext50_32x4d', 'resnext101_32x8d', 'resnext101_64x4d'] # 模型列表
 
 Train_Loss = [] # 训练过程的损失率
 Train_Accuracy = [] # 训练过程的准确率
@@ -44,7 +44,7 @@ def parse_opt(known=False):
     parser = argparse.ArgumentParser()
 
     # 可选参数
-    parser.add_argument('--data_dir', type=str, default=ROOT / 'datasets', help='path to the data directory')
+    parser.add_argument('--datasets', type=str, default=ROOT / 'datasets', help='path to the data directory')
     parser.add_argument('--epochs', type=int, default=30, help='total training epochs')
     parser.add_argument('--k', type=int, default=10, help='number of folds for k-fold cross validation')
     parser.add_argument('--batch_size', type=int, default=16, help='batch size for training and validation')
@@ -74,7 +74,7 @@ def main(opt):
         config = yaml.safe_load(config_file)
 
     # 检查数据集路径
-    assert os.path.exists(opt.data_dir), "{} path does not exist.".format(opt.data_dir)
+    assert os.path.exists(opt.datasets), "{} path does not exist.".format(opt.datasets)
 
     # 检查保存路径
     if not os.path.exists(opt.project):
@@ -87,21 +87,21 @@ def main(opt):
     os.makedirs(save_dir)
 
     # 判断训练模式
-    if os.path.exists(os.path.join(opt.data_dir, 'train')):
+    if os.path.exists(os.path.join(opt.datasets, 'train')):
         print("train-val validation")
         type = 'train_val'
-        num_classes = len([name for name in os.listdir(os.path.join(opt.data_dir, 'train'))
-                       if os.path.isdir(os.path.join(os.path.join(opt.data_dir, 'train'), name))])
+        num_classes = len([name for name in os.listdir(os.path.join(opt.datasets, 'train'))
+                       if os.path.isdir(os.path.join(os.path.join(opt.datasets, 'train'), name))])
         steps = opt.epochs
     else:
         print("k-fold cross validation")
         type = 'k_fold'
-        num_classes = len([name for name in os.listdir(opt.data_dir)
-                       if os.path.isdir(os.path.join(opt.data_dir, name))])
+        num_classes = len([name for name in os.listdir(opt.datasets)
+                       if os.path.isdir(os.path.join(opt.datasets, name))])
         steps = opt.k
 
     # 数据载入
-    data_loaders = DataLoaders(opt.data_dir, opt.batch_size, opt.num_workers, type, opt.k, save_dir)
+    data_loaders = DataLoaders(opt.datasets, opt.batch_size, opt.num_workers, type, opt.k, save_dir)
     train_loaders, val_loaders, train_num, val_num, class_list = data_loaders.load_data()
 
     # 网络载入
