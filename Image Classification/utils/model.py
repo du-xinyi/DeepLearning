@@ -4,7 +4,7 @@ import torch
 import torch.nn as nn
 
 from models.resnet import resnet18, resnet34, resnet50, resnet101, resnet152
-from models.resnext import resnext50_32x4d, resnext101_32x8d, resnext101_32x16d
+from models.resnext import resnext50_32x4d, resnext101_32x8d, resnext101_64x4d
 
 
 # 模型名称
@@ -16,19 +16,24 @@ model_dict = {
     'resnet152': resnet152,
     'resnext50_32x4d': resnext50_32x4d,
     'resnext101_32x8d': resnext101_32x8d,
-    'resnext101_32x16d': resnext101_32x16d
+    'resnext101_64x4d': resnext101_64x4d
 }
 
 # 预训练权重下载地址
 model_urls = {
-    'resnet18': 'https://download.pytorch.org/models/resnet18-5c106cde.pth',
-    'resnet34': 'https://download.pytorch.org/models/resnet34-333f7ec4.pth',
-    'resnet50': 'https://download.pytorch.org/models/resnet50-19c8e357.pth',
-    'resnet101': 'https://download.pytorch.org/models/resnet101-5d3b4d8f.pth',
-    'resnet152': 'https://download.pytorch.org/models/resnet152-b121ed2d.pth',
-    'resnext50_32x4d': 'https://download.pytorch.org/models/resnext50_32x4d-7cdf4587.pth',
-    'resnext101_32x8d': 'https://download.pytorch.org/models/resnext101_32x8d-8ba56ff5.pth',
-    'resnext101_32x16d': 'https://download.pytorch.org/models/ig_resnext101_32x16-c6f796b0.pth'
+    'resnet18': 'https://download.pytorch.org/models/resnet18-f37072fd.pth', # IMAGENET1K_V1
+    'resnet34': 'https://download.pytorch.org/models/resnet34-b627a593.pth', # IMAGENET1K_V1
+    # 'resnet50': 'https://download.pytorch.org/models/resnet50-0676ba61.pth', # IMAGENET1K_V1
+    'resnet50': 'https://download.pytorch.org/models/resnet50-11ad3fa6.pth', # IMAGENET1K_V2
+    # 'resnet101': 'https://download.pytorch.org/models/resnet101-63fe2227.pth', # IMAGENET1K_V1
+    'resnet101': 'https://download.pytorch.org/models/resnet101-cd907fc2.pth', # IMAGENET1K_V2
+    # 'resnet152': 'https://download.pytorch.org/models/resnet152-394f9c45.pth', # IMAGENET1K_V1
+    'resnet152': 'https://download.pytorch.org/models/resnet152-f82ba261.pth', # IMAGENET1K_V2
+    # 'resnext50_32x4d': 'https://download.pytorch.org/models/resnext50_32x4d-7cdf4587.pth', # IMAGENET1K_V1
+    'resnext50_32x4d': 'https://download.pytorch.org/models/resnext50_32x4d-1a0047aa.pth', # IMAGENET1K_V2
+    # 'resnext101_32x8d': 'https://download.pytorch.org/models/resnext101_32x8d-8ba56ff5.pth', # IMAGENET1K_V1
+    'resnext101_32x8d': 'https://download.pytorch.org/models/resnext101_32x8d-110c445d.pth', # IMAGENET1K_V2
+    'resnext101_64x4d': 'https://download.pytorch.org/models/resnext101_64x4d-173b62eb.pth' # IMAGENET1K_V1
 }
 
 # 下载预训练权重
