@@ -1,0 +1,8 @@
+salt_and_pepper:
+  probability: 0.1
+  intensity: 0.5
+gaussian:
+  mean: 0
+  std_dev: 25
+blur:
+  radius: 2
