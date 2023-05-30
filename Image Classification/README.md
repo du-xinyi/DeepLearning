@@ -2,6 +2,11 @@
 
 
 ## 更新日志
+**2023.5.30更新：**
+* 优化utils/model.py，更新预训练权重下载路径，优先使用IMAGENET1K_V2
+* 修复models/resnext.py
+* 将train.py命令行参数`--data_dir`改为`--datasets`
+
 **2023.5.29更新：**
 * 新增ResNeXt模型
 
@@ -17,7 +22,7 @@
 训练程序
 > 可选参数：
 ```
---data_dir: 数据集路径，默认为根目录下的datasets文件
+--datasets: 数据集路径，默认为根目录下的datasets文件
 --epochs: 训练-验证集模式的迭代次数，默认为30
 --k: K折交叉验证模式的K值，默认为10
 --batch_size: 每个批次中包含的样本数量，默认为16
