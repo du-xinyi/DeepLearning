@@ -2,43 +2,6 @@ import torch
 import torch.nn as nn
 
 
-# 基本残差结构块
-class BasicBlock(nn.Module):
-    expansion = 1 # 基本块扩展系数
-
-    def __init__(self, in_channel, out_channel, stride=1, downsample=None):
-        super(BasicBlock, self).__init__()
-
-        self.conv1 = nn.Conv2d(in_channels=in_channel, out_channels=out_channel,
-                               kernel_size=3, stride=stride, padding=1, bias=False)
-        self.bn1 = nn.BatchNorm2d(out_channel)
-        self.relu = nn.ReLU()
-
-        self.conv2 = nn.Conv2d(in_channels=out_channel, out_channels=out_channel,
-                               kernel_size=3, stride=1, padding=1, bias=False)
-        self.bn2 = nn.BatchNorm2d(out_channel)
-        self.downsample = downsample # 下采样
-
-    def forward(self, x):
-        identity = x
-        if self.downsample is not None:
-            identity = self.downsample(x) # 恒等映射的输出
-
-        # 主路径
-        out = self.conv1(x)
-        out = self.bn1(out)
-        out = self.relu(out)
-
-        out = self.conv2(out)
-        out = self.bn2(out)
-
-        # 主路径和残差路径的输出
-        out += identity
-        out = self.relu(out)
-
-        return out
-
-
 # 瓶颈残差结构块
 class Bottleneck(nn.Module):
     expansion = 4 # 输出通道数是输入通道数的4倍
@@ -129,12 +92,14 @@ class ResNeXt(nn.Module):
 
         layers = []
 
-        layers.append(block(self.in_channel, channel, downsample=downsample, stride=stride))
+        layers.append(block(self.in_channel, channel, downsample=downsample, stride=stride,
+                            groups=self.groups, width_per_group=self.width_per_group))
         self.in_channel = channel * block.expansion
 
         # 添加残差块
         for _ in range(1, block_num):
-            layers.append(block(self.in_channel, channel))
+            layers.append(block(self.in_channel, channel,
+                                groups=self.groups, width_per_group=self.width_per_group))
 
         return nn.Sequential(*layers)
 
@@ -171,8 +136,8 @@ def resnext101_32x8d(num_classes=1000, include_top=True):
                    groups=groups, width_per_group=width_per_group)
 
 
-def resnext101_32x16d(num_classes=1000, include_top=True):
-    groups = 32
-    width_per_group = 16
+def resnext101_64x4d(num_classes=1000, include_top=True):
+    groups = 64
+    width_per_group = 4
     return ResNeXt(Bottleneck, [3, 4, 23, 3], num_classes=num_classes, include_top=include_top,
                    groups=groups, width_per_group=width_per_group)
