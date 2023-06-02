@@ -3,7 +3,7 @@ import yaml
 import csv
 
 
-def opt_yaml(opt, type, classes, steps, config, start_time, end_time, save_dir):
+def opt_yaml(opt, type, num_classes, steps, config, start_time, end_time, save_dir):
     # 将参数转换为字典
     opt_dict = vars(opt)
 
@@ -11,7 +11,7 @@ def opt_yaml(opt, type, classes, steps, config, start_time, end_time, save_dir):
 
     # 添加参数
     selected_params.update({'type': type,
-                            'classes': classes,
+                            'num_classes': num_classes,
                             'steps': steps,
                             'batch_size': opt_dict['batch_size'],
                             'optimizer': opt_dict['optimizer'],
