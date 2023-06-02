@@ -6,24 +6,27 @@ import torch.nn as nn
 class Bottleneck(nn.Module):
     expansion = 4 # 输出通道数是输入通道数的4倍
 
-    def __init__(self, in_channel, out_channel, stride=1, downsample=None,
+    def __init__(self, in_channel, out_channel, stride=1, norm_layer=None, downsample=None,
                  groups=1, width_per_group=64):
         super(Bottleneck, self).__init__()
+
+        if norm_layer is None:
+            norm_layer = nn.BatchNorm2d
 
         width = int(out_channel * (width_per_group / 64.)) * groups
 
         self.conv1 = nn.Conv2d(in_channels=in_channel, out_channels=width,
                                kernel_size=1, stride=1, bias=False)
-        self.bn1 = nn.BatchNorm2d(width)
+        self.bn1 = norm_layer(width)
 
         # 组卷积的数
         self.conv2 = nn.Conv2d(in_channels=width, out_channels=width, groups=groups,
                                kernel_size=3, stride=stride, bias=False, padding=1)
-        self.bn2 = nn.BatchNorm2d(width)
+        self.bn2 = norm_layer(width)
 
         self.conv3 = nn.Conv2d(in_channels=width, out_channels=out_channel * self.expansion,
                                kernel_size=1, stride=1, bias=False)
-        self.bn3 = nn.BatchNorm2d(out_channel * self.expansion)
+        self.bn3 = norm_layer(out_channel * self.expansion)
         self.relu = nn.ReLU(inplace=True)
         self.downsample = downsample
 
@@ -50,8 +53,12 @@ class Bottleneck(nn.Module):
 
 
 class ResNeXt(nn.Module):
-    def __init__(self, block, blocks_num, num_classes=1000, include_top=True, groups=1, width_per_group=64):
+    def __init__(self, block, blocks_num, num_classes=1000, norm_layer=None, include_top=True,
+                 groups=1, width_per_group=64):
         super(ResNeXt, self).__init__()
+
+        if norm_layer is None:
+            norm_layer = nn.BatchNorm2d
 
         self.include_top = include_top
         self.in_channel = 64
@@ -60,7 +67,7 @@ class ResNeXt(nn.Module):
         self.width_per_group = width_per_group
 
         self.conv1 = nn.Conv2d(3, self.in_channel, kernel_size=7, stride=2, padding=3, bias=False)
-        self.bn1 = nn.BatchNorm2d(self.in_channel)
+        self.bn1 = norm_layer(self.in_channel)
         self.relu = nn.ReLU(inplace=True)
         self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
 
@@ -122,17 +129,17 @@ class ResNeXt(nn.Module):
         return x
 
 
-def resnext50_32x4d(num_classes=1000, include_top=True):
+def resnext50_32x4d(num_classes=1000, norm_layer=None, include_top=True):
     groups = 32
     width_per_group = 4
-    return ResNeXt(Bottleneck, [3, 4, 6, 3], num_classes=num_classes, include_top=include_top,
+    return ResNeXt(Bottleneck, [3, 4, 6, 3], num_classes=num_classes, norm_layer=norm_layer, include_top=include_top,
                    groups=groups, width_per_group=width_per_group)
 
 
-def resnext101_32x8d(num_classes=1000, include_top=True):
+def resnext101_32x8d(num_classes=1000, norm_layer=None, include_top=True):
     groups = 32
     width_per_group = 8
-    return ResNeXt(Bottleneck, [3, 4, 23, 3], num_classes=num_classes, include_top=include_top,
+    return ResNeXt(Bottleneck, [3, 4, 23, 3], num_classes=num_classes, norm_layer=norm_layer, include_top=include_top,
                    groups=groups, width_per_group=width_per_group)
 
 

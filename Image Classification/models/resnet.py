@@ -6,17 +6,20 @@ import torch.nn as nn
 class BasicBlock(nn.Module):
     expansion = 1 # 基本块扩展系数
 
-    def __init__(self, in_channel, out_channel, stride=1, downsample=None):
+    def __init__(self, in_channel, out_channel, stride=1, norm_layer=None, downsample=None):
         super(BasicBlock, self).__init__()
+
+        if norm_layer is None:
+            norm_layer = nn.BatchNorm2d
 
         self.conv1 = nn.Conv2d(in_channels=in_channel, out_channels=out_channel,
                                kernel_size=3, stride=stride, padding=1, bias=False)
-        self.bn1 = nn.BatchNorm2d(out_channel)
+        self.bn1 = norm_layer(out_channel)
         self.relu = nn.ReLU()
 
         self.conv2 = nn.Conv2d(in_channels=out_channel, out_channels=out_channel,
                                kernel_size=3, stride=1, padding=1, bias=False)
-        self.bn2 = nn.BatchNorm2d(out_channel)
+        self.bn2 = norm_layer(out_channel)
         self.downsample = downsample # 下采样
 
     def forward(self, x):
@@ -43,20 +46,23 @@ class BasicBlock(nn.Module):
 class Bottleneck(nn.Module):
     expansion = 4 # 输出通道数是输入通道数的4倍
 
-    def __init__(self, in_channel, out_channel, stride=1, downsample=None):
+    def __init__(self, in_channel, out_channel, stride=1, norm_layer=None, downsample=None):
         super(Bottleneck, self).__init__()
+
+        if norm_layer is None:
+            norm_layer = nn.BatchNorm2d
 
         self.conv1 = nn.Conv2d(in_channels=in_channel, out_channels=out_channel,
                                kernel_size=1, stride=1, bias=False)
-        self.bn1 = nn.BatchNorm2d(out_channel)
+        self.bn1 = norm_layer(out_channel)
 
         self.conv2 = nn.Conv2d(in_channels=out_channel, out_channels=out_channel,
                                kernel_size=3, stride=stride, bias=False, padding=1)
-        self.bn2 = nn.BatchNorm2d(out_channel)
+        self.bn2 = norm_layer(out_channel)
 
         self.conv3 = nn.Conv2d(in_channels=out_channel, out_channels=out_channel * self.expansion,
                                kernel_size=1, stride=1, bias=False)
-        self.bn3 = nn.BatchNorm2d(out_channel * self.expansion)
+        self.bn3 = norm_layer(out_channel * self.expansion)
         self.relu = nn.ReLU(inplace=True)
         self.downsample = downsample
 
@@ -83,14 +89,18 @@ class Bottleneck(nn.Module):
 
 
 class ResNet(nn.Module):
-    def __init__(self, block, blocks_num, num_classes=1000, include_top=True):
+    def __init__(self, block, blocks_num, num_classes=1000, norm_layer=None, include_top=True):
         super(ResNet, self).__init__()
 
+        if norm_layer is None:
+            norm_layer = nn.BatchNorm2d
+
+        self._norm_layer = norm_layer
         self.include_top = include_top
         self.in_channel = 64
 
         self.conv1 = nn.Conv2d(3, self.in_channel, kernel_size=7, stride=2, padding=3, bias=False)
-        self.bn1 = nn.BatchNorm2d(self.in_channel)
+        self.bn1 = norm_layer(self.in_channel)
         self.relu = nn.ReLU(inplace=True)
         self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
 
@@ -150,21 +160,21 @@ class ResNet(nn.Module):
         return x
 
 
-def resnet18(num_classes=1000, include_top=True):
-    return ResNet(BasicBlock, [2, 2, 2, 2], num_classes=num_classes, include_top=include_top)
+def resnet18(num_classes=1000, norm_layer=None, include_top=True):
+    return ResNet(BasicBlock, [2, 2, 2, 2], num_classes=num_classes, norm_layer=norm_layer, include_top=include_top)
 
 
-def resnet34(num_classes=1000, include_top=True):
-    return ResNet(BasicBlock, [3, 4, 6, 3], num_classes=num_classes, include_top=include_top)
+def resnet34(num_classes=1000, norm_layer=None, include_top=True):
+    return ResNet(BasicBlock, [3, 4, 6, 3], num_classes=num_classes, norm_layer=norm_layer,  include_top=include_top)
 
 
-def resnet50(num_classes=1000, include_top=True):
-    return ResNet(Bottleneck, [3, 4, 6, 3], num_classes=num_classes, include_top=include_top)
+def resnet50(num_classes=1000, norm_layer=None, include_top=True):
+    return ResNet(Bottleneck, [3, 4, 6, 3], num_classes=num_classes, norm_layer=norm_layer,  include_top=include_top)
 
 
-def resnet101(num_classes=1000, include_top=True):
-    return ResNet(Bottleneck, [3, 4, 23, 3], num_classes=num_classes, include_top=include_top)
+def resnet101(num_classes=1000, norm_layer=None, include_top=True):
+    return ResNet(Bottleneck, [3, 4, 23, 3], num_classes=num_classes, norm_layer=norm_layer,  include_top=include_top)
 
 
-def resnet152(num_classes=1000, include_top=True):
-    return ResNet(Bottleneck, [3, 8, 36, 3], num_classes=num_classes, include_top=include_top)
+def resnet152(num_classes=1000, norm_layer=None, include_top=True):
+    return ResNet(Bottleneck, [3, 8, 36, 3], num_classes=num_classes, norm_layer=norm_layer,  include_top=include_top)
