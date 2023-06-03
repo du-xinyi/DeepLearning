@@ -454,7 +454,3 @@ def inception_v1(num_classes=1000, aux_logits=True):
 
 def inception_v3(num_classes=1000, aux_logits=True):
     return Inception_V3(num_classes=num_classes, aux_logits=aux_logits)
-
-
-def inception_v4():
-    return Inception_V1()

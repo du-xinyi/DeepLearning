@@ -3,7 +3,7 @@ import urllib.request
 import torch
 import torch.nn as nn
 
-from models.inception import inception_v1, inception_v3, inception_v4
+from models.inception import inception_v1, inception_v3
 from models.resnet import resnet18, resnet34, resnet50, resnet101, resnet152
 from models.resnext import resnext50_32x4d, resnext101_32x8d, resnext101_64x4d
 
@@ -12,7 +12,6 @@ from models.resnext import resnext50_32x4d, resnext101_32x8d, resnext101_64x4d
 model_list = {
     'inception_v1': inception_v1,
     'inception_v3': inception_v3,
-    'inception_v4': inception_v4,
     'resnet18': resnet18,
     'resnet34': resnet34,
     'resnet50': resnet50,
@@ -25,7 +24,6 @@ model_list = {
 
 # 无训练权重的模型
 no_pre_model = {
-    'inception_v4': inception_v4,
 }
 
 # 预训练权重下载地址
