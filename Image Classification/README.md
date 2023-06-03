@@ -4,6 +4,8 @@
 ## 更新日志
 **2023.6.3**
 * 新增InceptionV1、V3模型
+* 更新utils/dataloaders.py，根据所选择的模型切换transform
+* cfg.yaml保存参数从classes改为class_num
 * 修复detect.py参数传递错误
 
 **2023.6.2**
@@ -12,7 +14,7 @@
 **2023.5.30更新：**
 * 优化utils/model.py，更新预训练权重下载路径，优先使用IMAGENET1K_V2
 * 修复models/resnext.py
-* 将train.py命令行参数`--data_dir`改为`--datasets`
+  train.py命令行参数`--data_dir`改为`--datasets`
 
 **2023.5.29更新：**
 * 新增ResNeXt模型
