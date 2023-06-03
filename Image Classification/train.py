@@ -25,6 +25,7 @@ optimizer_list = ['SGD', 'Adam', 'RMSprop'] # 优化器列表
 lr_list = ['Fixed', 'Cosine'] # 学习率列表
 loss_list = ['CrossEntropyLoss', 'NLLLoss', 'BCEWithLogitsLoss', 'BCELoss'] # 损失函数列表
 model_list = [
+    'inception_v1', 'inception_v3', 'inception_v4',
     'resnet18','resnet34', 'resnet50', 'resnet101', 'resnet152',
     'resnext50_32x4d', 'resnext101_32x8d', 'resnext101_64x4d'] # 模型列表
 
@@ -101,14 +102,18 @@ def main(opt):
         steps = opt.k
 
     # 数据载入
-    data_loaders = DataLoaders(opt.datasets, opt.batch_size, opt.num_workers, type, opt.k, save_dir)
+    data_loaders = DataLoaders(data_dir=opt.datasets, batch_size=opt.batch_size,
+                               num_workers=opt.num_workers, type=type, model=opt.model,
+                               k_fold=opt.k, save_dir=save_dir)
     train_loaders, val_loaders, train_num, val_num, class_list = data_loaders.load_data()
 
     # 网络载入
-    model = net(num_classes, opt.model, opt.device, opt.weights, opt.no_transfer_learning)
+    model = net(num_classes, model=opt.model, device=opt.device,
+                weight=opt.weights, transfer_learning=opt.no_transfer_learning)
 
     # 优化器和学习率调度器载入
-    optimize, schedule =optimizer(opt.optimizer, opt.lr, steps, config, model.parameters())
+    optimize, schedule =optimizer(optimizer_name=opt.optimizer, lr_name=opt.lr, step=steps,
+                                  config=config, model_parameters=model.parameters())
 
     # 损失函数载入
     loss_function = select_loss(opt.loss)
@@ -129,7 +134,6 @@ def main(opt):
         running_loss = 0.0
         train_correct = 0
         train_total = 0
-        step = 0
 
         if type == 'k_fold':
             train_loader = train_loaders[epoch]
@@ -138,11 +142,26 @@ def main(opt):
             train_loader = train_loaders
             val_loader = val_loaders
 
-        for step, data in enumerate(train_loader, start=0):
+        for step, data in enumerate(train_loader, start=1):
             images, labels = data
             optimize.zero_grad()
-            logits = model(images.to(opt.device))
-            loss = loss_function(logits, labels.to(opt.device))
+            if opt.model == 'inception_v1':
+                logits, aux_logits2, aux_logits1 = model(images.to(opt.device))
+                loss0 = loss_function(logits, labels.to(opt.device))
+                loss1 = loss_function(aux_logits1, labels.to(opt.device))
+                loss2 = loss_function(aux_logits2, labels.to(opt.device))
+
+                loss = loss0 + loss1 * 0.3 + loss2 * 0.3
+            elif opt.model == 'inception_v3':
+                logits, aux = model(images.to(opt.device))
+                loss0 = loss_function(logits, labels.to(opt.device))
+                loss1 = loss_function(aux, labels.to(opt.device))
+
+                loss = loss0 + loss1 * 0.3
+            else:
+                logits = model(images.to(opt.device))
+
+                loss = loss_function(logits, labels.to(opt.device))
             loss.backward()
 
             # 更新优化器和学习率
@@ -197,23 +216,29 @@ def main(opt):
             Val_Loss.append(val_loss)
             Val_Accuracy.append(val_accurate)
 
-            model_parameters(Train_Loss, Train_Accuracy, Val_Loss, Val_Accuracy, save_dir) # 保存训练过程数据
+            model_parameters(Train_Loss=Train_Loss, Train_Accuracy=Train_Accuracy,
+                             Val_Loss=Val_Loss, Val_Accuracy=Val_Accuracy,
+                             save_dir=save_dir) # 保存训练过程数据
 
     # 绘制损失率和准确率
-    plot_loss(Train_Loss, Val_Loss, save_dir)
-    plot_accuracy(Train_Accuracy, Val_Accuracy, save_dir)
+    plot_loss(Train_Loss=Train_Loss, Val_Loss=Val_Loss, save_dir=save_dir)
+    plot_accuracy(Train_Accuracy=Train_Accuracy, Val_Accuracy=Val_Accuracy, save_dir=save_dir)
 
     # 绘制混淆矩阵和颜色条
-    plot_confusion_matrix(targets, predictions, class_list, save_dir)
+    plot_confusion_matrix(targets=targets, predictions=predictions,
+                          class_list=class_list, save_dir=save_dir)
 
     # 绘制F1图
-    plot_f1_scores(targets, predictions, class_list, save_dir)
+    plot_f1_scores(targets=targets, predictions=predictions,
+                   class_list=class_list, save_dir=save_dir)
 
     # 结束时间
     end_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
 
     # 保存参数
-    opt_yaml(opt, type, num_classes, steps, config, start_time, end_time, save_dir)
+    opt_yaml(opt=opt, type=type, num_classes=num_classes, steps=steps,
+             config=config, start_time=start_time, end_time=end_time,
+             save_dir=save_dir)
 
     print('Finished Training')
 
