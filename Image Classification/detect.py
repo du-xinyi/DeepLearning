@@ -71,17 +71,17 @@ def main(opt):
 
     os.makedirs(save_dir)
 
-    class_num = data.get('classes') # 类别数量
+    class_num = data.get('num_classes') # 类别数量
     model_name = data.get('model') # 网络名称
 
     # 载入模型
-    model = net(class_num, model_name)
+    model = net(number=class_num, model=model_name)
     model_weight_path = opt.weights
     model.load_state_dict(torch.load(model_weight_path, map_location=opt.device))
 
     # 载入图片
     transform = ImageTransform()
-    images, names, paths = transform.transform_image(opt.source)
+    images, names, paths = transform.transform_image(opt.source, model_name)
 
     model.eval() # 评估模式
     # 保存结果
