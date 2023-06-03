@@ -2,6 +2,13 @@
 
 
 ## 更新日志
+**2023.6.3**
+* 新增InceptionV1、V3模型
+* 修复detect.py参数传递错误
+
+**2023.6.2**
+* 优化utils/parameters.py, models/resnet.py, models/resnext.py
+
 **2023.5.30更新：**
 * 优化utils/model.py，更新预训练权重下载路径，优先使用IMAGENET1K_V2
 * 修复models/resnext.py
