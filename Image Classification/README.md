@@ -2,6 +2,9 @@
 
 
 ## 更新日志
+**2023.6.4**
+* 将InceptionV1改为GoogleNet
+
 **2023.6.3**
 * 新增InceptionV1、V3模型
 * 更新utils/dataloaders.py，根据所选择的模型切换transform
