@@ -25,7 +25,7 @@ optimizer_list = ['SGD', 'Adam', 'RMSprop'] # 优化器列表
 lr_list = ['Fixed', 'Cosine'] # 学习率列表
 loss_list = ['CrossEntropyLoss', 'NLLLoss', 'BCEWithLogitsLoss', 'BCELoss'] # 损失函数列表
 model_list = [
-    'inception_v1', 'inception_v3',
+    'googlenet', 'inception_v3',
     'resnet18','resnet34', 'resnet50', 'resnet101', 'resnet152',
     'resnext50_32x4d', 'resnext101_32x8d', 'resnext101_64x4d'] # 模型列表
 
@@ -145,7 +145,7 @@ def main(opt):
         for step, data in enumerate(train_loader, start=1):
             images, labels = data
             optimize.zero_grad()
-            if opt.model == 'inception_v1':
+            if opt.model == 'googlenet':
                 logits, aux_logits2, aux_logits1 = model(images.to(opt.device))
                 loss0 = loss_function(logits, labels.to(opt.device))
                 loss1 = loss_function(aux_logits1, labels.to(opt.device))
