@@ -2,6 +2,9 @@
 
 
 ## 更新日志
+**2023.6.5**
+* 新增AlexNet模型
+
 **2023.6.4**
 * 将InceptionV1改为GoogleNet
 

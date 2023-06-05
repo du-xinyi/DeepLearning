@@ -25,6 +25,7 @@ optimizer_list = ['SGD', 'Adam', 'RMSprop'] # 优化器列表
 lr_list = ['Fixed', 'Cosine'] # 学习率列表
 loss_list = ['CrossEntropyLoss', 'NLLLoss', 'BCEWithLogitsLoss', 'BCELoss'] # 损失函数列表
 model_list = [
+    'alexnet',
     'googlenet', 'inception_v3',
     'resnet18','resnet34', 'resnet50', 'resnet101', 'resnet152',
     'resnext50_32x4d', 'resnext101_32x8d', 'resnext101_64x4d'] # 模型列表
@@ -45,7 +46,7 @@ def parse_opt(known=False):
     parser = argparse.ArgumentParser()
 
     # 可选参数
-    parser.add_argument('--datasets', type=str, default=ROOT / 'datasets', help='path to the data directory')
+    parser.add_argument('--datasets', type=str, default=ROOT / 'test', help='path to the data directory')
     parser.add_argument('--epochs', type=int, default=30, help='total training epochs')
     parser.add_argument('--k', type=int, default=10, help='number of folds for k-fold cross validation')
     parser.add_argument('--batch_size', type=int, default=16, help='batch size for training and validation')
@@ -54,7 +55,7 @@ def parse_opt(known=False):
     parser.add_argument('--loss', type=str, choices=loss_list, default='CrossEntropyLoss', help='loss function')
     parser.add_argument('--num_workers', type=int, default=min([os.cpu_count(), 8]),
                         help='number of worker threads for loading data')
-    parser.add_argument('--model', type=str, choices=model_list, default='resnet152',help='choose the network model')
+    parser.add_argument('--model', type=str, choices=model_list, default='alexnet',help='choose the network model')
     parser.add_argument('--weights', type=str, default='', help='initial weights path')
     parser.add_argument('--no_transfer_learning', action='store_false',
                         help='disable transfer learning')
