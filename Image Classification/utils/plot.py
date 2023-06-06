@@ -5,29 +5,8 @@ import numpy as np
 
 from sklearn.metrics import classification_report
 
-def plot_loss(Train_Loss, Val_Loss, save_dir):
-    plt.plot(Train_Loss, label='Train Loss')
-    plt.plot(Val_Loss, label='Validation Loss')
-    plt.xlabel("Epoch")
-    plt.ylabel("Loss")
-    plt.title('Loss')
-    plt.legend()
-    plt.savefig(os.path.join(save_dir, 'loss.jpg'), bbox_inches='tight')
-    plt.show()
 
-
-def plot_accuracy(Train_Accuracy, Val_Accuracy, save_dir):
-    plt.plot(Train_Accuracy, label='Train Accuracy')
-    plt.plot(Val_Accuracy, label='Validation Accuracy')
-    plt.xlabel("Epoch")
-    plt.ylabel("Accuracy")
-    plt.title('Accuracy')
-    plt.legend()
-    plt.savefig(os.path.join(save_dir, 'accuracy.jpg'), bbox_inches='tight')
-    plt.show()
-
-
-def plot_evaluation(targets, predictions, class_list, save_dir):
+def plot_evaluation(train_loss, val_loss, train_accuracy, val_accuracy, targets, predictions, class_list, save_dir):
     num_classes = len(class_list)
 
     # 混淆矩阵
@@ -40,6 +19,26 @@ def plot_evaluation(targets, predictions, class_list, save_dir):
 
     # 提取各个类别的F1值
     f1_scores = [report[class_name]['f1-score'] for class_name in class_list]
+
+    # 绘制loss曲线
+    plt.plot(train_loss, label='Train Loss')
+    plt.plot(val_loss, label='Validation Loss')
+    plt.xlabel("Epoch")
+    plt.ylabel("Loss")
+    plt.title('Loss')
+    plt.legend()
+    plt.savefig(os.path.join(save_dir, 'loss.jpg'), bbox_inches='tight')
+    plt.show()
+
+    # 绘制accuracy曲线
+    plt.plot(train_accuracy, label='Train Accuracy')
+    plt.plot(val_accuracy, label='Validation Accuracy')
+    plt.xlabel("Epoch")
+    plt.ylabel("Accuracy")
+    plt.title('Accuracy')
+    plt.legend()
+    plt.savefig(os.path.join(save_dir, 'accuracy.jpg'), bbox_inches='tight')
+    plt.show()
 
     # 绘制混淆矩阵
     fig, ax = plt.subplots(figsize=(12, 10))
@@ -67,7 +66,7 @@ def plot_evaluation(targets, predictions, class_list, save_dir):
     plt.savefig(os.path.join(save_dir, 'confusion_matrix.png'), bbox_inches='tight')
     plt.show()
 
-    # 绘制F1值柱状图
+    # 绘制F1值
     plt.bar(range(num_classes), f1_scores)
     plt.xlabel('Class')
     plt.ylabel('F1 Score')

@@ -12,7 +12,7 @@ from utils.dataloaders import DataLoaders
 from utils.model import net
 from utils.optimizer import optimizer
 from utils.loss import select_loss
-from utils.plot import plot_loss, plot_accuracy, plot_evaluation
+from utils.plot import plot_evaluation
 
 
 # 获取当前文件夹路径
@@ -237,7 +237,9 @@ def main(opt):
     # 绘图
     plot_loss(Train_Loss=Train_Loss, Val_Loss=Val_Loss, save_dir=save_dir)
     plot_accuracy(Train_Accuracy=Train_Accuracy, Val_Accuracy=Val_Accuracy, save_dir=save_dir)
-    plot_evaluation(targets=targets, predictions=predictions,class_list=class_list, save_dir=save_dir)
+    plot_evaluation(train_loss=Train_Loss, val_loss=Val_Loss,
+                    train_accuracy=Train_Accuracy, val_accuracy=Val_Accuracy,
+                    targets=targets, predictions=predictions,class_list=class_list, save_dir=save_dir)
 
     # 结束时间
     end_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
