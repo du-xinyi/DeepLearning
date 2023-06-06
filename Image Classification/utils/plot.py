@@ -27,12 +27,21 @@ def plot_accuracy(Train_Accuracy, Val_Accuracy, save_dir):
     plt.show()
 
 
-def plot_confusion_matrix(targets, predictions, class_list, save_dir):
+def plot_evaluation(targets, predictions, class_list, save_dir):
     num_classes = len(class_list)
+
+    # 混淆矩阵
     confusion_matrix = np.zeros((num_classes, num_classes), dtype=int)
     for true, pred in zip(targets, predictions):
         confusion_matrix[true][pred] += 1
 
+    # 生成分类报告
+    report = classification_report(targets, predictions, target_names=class_list, output_dict=True, zero_division=1)
+
+    # 提取各个类别的F1值
+    f1_scores = [report[class_name]['f1-score'] for class_name in class_list]
+
+    # 绘制混淆矩阵
     fig, ax = plt.subplots(figsize=(12, 10))
     heatmap = sns.heatmap(confusion_matrix, annot=True, fmt="d", cmap="Blues",
                           xticklabels=range(num_classes),
@@ -58,16 +67,7 @@ def plot_confusion_matrix(targets, predictions, class_list, save_dir):
     plt.savefig(os.path.join(save_dir, 'confusion_matrix.png'), bbox_inches='tight')
     plt.show()
 
-
-def plot_f1_scores(targets, predictions, class_list, save_dir):
-    num_classes = len(class_list)
-    # 生成分类报告
-    report = classification_report(targets, predictions, target_names=class_list, output_dict=True, zero_division=1)
-
-    # 提取各个类别的F1值
-    f1_scores = [report[class_name]['f1-score'] for class_name in class_list]
-
-    # 绘制F1图
+    # 绘制F1值柱状图
     plt.bar(range(num_classes), f1_scores)
     plt.xlabel('Class')
     plt.ylabel('F1 Score')
