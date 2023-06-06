@@ -4,6 +4,7 @@ import torch
 import torch.nn as nn
 
 from models.alexnet import alexnet
+from models.densenet import densenet121, densenet161, densenet169, densenet201
 from models.googlenet import googlenet
 from models.inception import inception_v3
 from models.resnet import resnet18, resnet34, resnet50, resnet101, resnet152
@@ -13,6 +14,10 @@ from models.resnext import resnext50_32x4d, resnext101_32x8d, resnext101_64x4d
 # 模型名称
 model_list = {
     'alexnet': alexnet,
+    'densenet121': densenet121,
+    'densenet161': densenet161,
+    'densenet169': densenet169,
+    'densenet201': densenet201,
     'googlenet': googlenet,
     'inception_v3': inception_v3,
     'resnet18': resnet18,
@@ -32,6 +37,10 @@ no_pre_model = {
 # 预训练权重下载地址
 model_urls = {
     'alexnet': 'https://download.pytorch.org/models/alexnet-owt-7be5be79.pth', # IMAGENET1K_V1
+    'densenet121': 'https://download.pytorch.org/models/densenet121-a639ec97.pth', # IMAGENET1K_V1
+    'densenet161': 'https://download.pytorch.org/models/densenet161-8d451a50.pth', # IMAGENET1K_V1
+    'densenet169': 'https://download.pytorch.org/models/densenet169-b2777c0a.pth', # IMAGENET1K_V1
+    'densenet201': 'https://download.pytorch.org/models/densenet201-c1103571.pth', # IMAGENET1K_V1
     'googlenet': 'https://download.pytorch.org/models/googlenet-1378be20.pth', # IMAGENET1K_V1
     'inception_v3': 'https://download.pytorch.org/models/inception_v3_google-0cc3c7bd.pth', # IMAGENET1K_V1
     'resnet18': 'https://download.pytorch.org/models/resnet18-f37072fd.pth', # IMAGENET1K_V1
