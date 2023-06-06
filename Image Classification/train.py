@@ -223,7 +223,7 @@ def main(opt):
 
             print('[epoch %d] train_loss: %.3f  train_accuracy: %.3f  val_loss: %.3f  val_accuracy: %.3f' %
                   (epoch, train_loss, train_accuracy, val_loss, val_accurate))
-            
+
             Train_Loss.append(train_loss)
             Train_Accuracy.append(train_accuracy)
             Val_Loss.append(val_loss)
