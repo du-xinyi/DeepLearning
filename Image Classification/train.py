@@ -84,10 +84,10 @@ def main(opt):
     if not os.path.exists(opt.project):
         os.makedirs(opt.project)
 
+    # 生成保存路径
     folder_count = len([name for name in os.listdir(opt.project)
-                        if os.path.isdir(os.path.join(opt.project, name))]) # 获取指定文件夹内的文件夹数量
-    save_dir = os.path.join(opt.project, opt.name + f"{folder_count+1}")
-
+                        if os.path.isdir(os.path.join(opt.project, name))])
+    save_dir = os.path.join(opt.project, opt.name + f"{folder_count+1}") # 获取指定文件夹内的文件夹数量
     os.makedirs(save_dir)
 
     # 创建可视化对象
@@ -125,22 +125,22 @@ def main(opt):
     # 损失函数载入
     loss_function = select_loss(opt.loss)
 
-    best_acc = 0.0
-
-    # 保存的模型
+        # 保存的模型
     weight_dir = os.path.join(save_dir, 'weights')
     if not os.path.exists(weight_dir):
         os.makedirs(weight_dir)
     best_weight = os.path.join(weight_dir, 'best.pth')
     last_weight = os.path.join(weight_dir, 'last.pth')
 
+    best_acc = 0.0  # 最佳识别率
+
     for epoch in range(steps):
         # train
         model.train()
 
-        running_loss = 0.0
-        train_correct = 0
-        train_total = 0
+        running_loss = 0.0 # 累计的损失值
+        train_correct = 0 # 累计的正确预测的样本数
+        train_total = 0 # 累计的训练样本总数
 
         if type == 'k_fold':
             train_loader = train_loaders[epoch]
@@ -152,7 +152,8 @@ def main(opt):
         for step, data in enumerate(train_loader, start=1):
             images, labels = data
             optimize.zero_grad()
-            if opt.model == 'googlenet':
+
+            if opt.model == 'googlenet': # GoogleNet带有两个辅助分类器
                 logits, aux_logits2, aux_logits1 = model(images.to(opt.device))
                 loss0 = loss_function(logits, labels.to(opt.device))
                 loss1 = loss_function(aux_logits1, labels.to(opt.device))
@@ -176,24 +177,27 @@ def main(opt):
             if schedule is not None:
                 schedule.step()
 
-            # 计算训练损失和准确率
+            # 计算训练损失、准确率和训练样本数量
             running_loss += loss.item()
             _, predicted = torch.max(logits, 1)
             train_correct += (predicted == labels.to(opt.device)).sum().item()
             train_total += labels.size(0)
 
+            # 训练进度
             rate = step / len(train_loader)
             a = "*" * int(rate * 50)
             b = "." * int((1 - rate) * 50)
             print("\rtrain loss: {:^3.0f}%[{}->{}]{:.4f}".format(int(rate * 100), a, b, loss), end="")
         print()
-        train_loss = running_loss / step
-        train_accuracy = train_correct / train_total
+
+        train_loss = running_loss / step # 训练集平均损失
+        train_accuracy = train_correct / train_total # 训练集准确率
 
         # validate
         model.eval()
+
         running_loss = 0.0
-        acc = 0.0
+        val_acc = 0.0
 
         with torch.no_grad():
             for val_data in val_loader:
@@ -203,13 +207,14 @@ def main(opt):
                 predict_y = torch.max(outputs, dim=1)[1]
 
                 running_loss += loss.item()
-                acc += (predict_y == val_labels.to(opt.device)).sum().item()
+                val_acc += (predict_y == val_labels.to(opt.device)).sum().item()
 
                 # 保存预测结果和真实标签
                 predictions.extend(predict_y.tolist())
                 targets.extend(val_labels.tolist())
-            val_loss = running_loss / step
-            val_accurate = acc / val_num
+            val_loss = running_loss / step # 验证集平均损失
+            val_accurate = val_acc / val_num # 验证集准确率
+
             # 保存模型
             if val_accurate > best_acc:
                 best_acc = val_accurate
@@ -218,6 +223,7 @@ def main(opt):
 
             print('[epoch %d] train_loss: %.3f  train_accuracy: %.3f  val_loss: %.3f  val_accuracy: %.3f' %
                   (epoch, train_loss, train_accuracy, val_loss, val_accurate))
+            
             Train_Loss.append(train_loss)
             Train_Accuracy.append(train_accuracy)
             Val_Loss.append(val_loss)
@@ -235,8 +241,6 @@ def main(opt):
                              save_dir=save_dir)
 
     # 绘图
-    plot_loss(Train_Loss=Train_Loss, Val_Loss=Val_Loss, save_dir=save_dir)
-    plot_accuracy(Train_Accuracy=Train_Accuracy, Val_Accuracy=Val_Accuracy, save_dir=save_dir)
     plot_evaluation(train_loss=Train_Loss, val_loss=Val_Loss,
                     train_accuracy=Train_Accuracy, val_accuracy=Val_Accuracy,
                     targets=targets, predictions=predictions,class_list=class_list, save_dir=save_dir)
