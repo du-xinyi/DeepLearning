@@ -6,12 +6,13 @@ import yaml
 import time
 
 from pathlib import Path
+from torch.utils.tensorboard import SummaryWriter
 from utils.parameters import opt_yaml, model_parameters
 from utils.dataloaders import DataLoaders
 from utils.model import net
 from utils.optimizer import optimizer
 from utils.loss import select_loss
-from utils.plot import plot_loss, plot_accuracy, plot_confusion_matrix, plot_f1_scores
+from utils.plot import plot_loss, plot_accuracy, plot_evaluation
 
 
 # 获取当前文件夹路径
@@ -47,7 +48,7 @@ def parse_opt(known=False):
     parser = argparse.ArgumentParser()
 
     # 可选参数
-    parser.add_argument('--datasets', type=str, default=ROOT / 'datasets', help='path to the data directory')
+    parser.add_argument('--datasets', type=str, default=ROOT / 'test', help='path to the data directory')
     parser.add_argument('--epochs', type=int, default=30, help='total training epochs')
     parser.add_argument('--k', type=int, default=10, help='number of folds for k-fold cross validation')
     parser.add_argument('--batch_size', type=int, default=16, help='batch size for training and validation')
@@ -56,7 +57,7 @@ def parse_opt(known=False):
     parser.add_argument('--loss', type=str, choices=loss_list, default='CrossEntropyLoss', help='loss function')
     parser.add_argument('--num_workers', type=int, default=min([os.cpu_count(), 8]),
                         help='number of worker threads for loading data')
-    parser.add_argument('--model', type=str, choices=model_list, default='resnet152',help='choose the network model')
+    parser.add_argument('--model', type=str, choices=model_list, default='alexnet',help='choose the network model')
     parser.add_argument('--weights', type=str, default='', help='initial weights path')
     parser.add_argument('--no_transfer_learning', action='store_false',
                         help='disable transfer learning')
@@ -89,6 +90,9 @@ def main(opt):
 
     os.makedirs(save_dir)
 
+    # 创建可视化对象
+    writer = SummaryWriter(log_dir=save_dir)
+
     # 判断训练模式
     if os.path.exists(os.path.join(opt.datasets, 'train')):
         print("train-val validation")
@@ -112,6 +116,7 @@ def main(opt):
     # 网络载入
     model = net(num_classes, model=opt.model, device=opt.device,
                 weight=opt.weights, transfer_learning=opt.no_transfer_learning)
+    # print(model)
 
     # 优化器和学习率调度器载入
     optimize, schedule =optimizer(optimizer_name=opt.optimizer, lr_name=opt.lr, step=steps,
@@ -177,7 +182,7 @@ def main(opt):
             train_correct += (predicted == labels.to(opt.device)).sum().item()
             train_total += labels.size(0)
 
-            rate = (step + 1) / len(train_loader)
+            rate = step / len(train_loader)
             a = "*" * int(rate * 50)
             b = "." * int((1 - rate) * 50)
             print("\rtrain loss: {:^3.0f}%[{}->{}]{:.4f}".format(int(rate * 100), a, b, loss), end="")
@@ -212,27 +217,27 @@ def main(opt):
             torch.save(model.state_dict(), last_weight) # 最终模型
 
             print('[epoch %d] train_loss: %.3f  train_accuracy: %.3f  val_loss: %.3f  val_accuracy: %.3f' %
-                  (epoch + 1, train_loss, train_accuracy, val_loss, val_accurate))
+                  (epoch, train_loss, train_accuracy, val_loss, val_accurate))
             Train_Loss.append(train_loss)
             Train_Accuracy.append(train_accuracy)
             Val_Loss.append(val_loss)
             Val_Accuracy.append(val_accurate)
 
+            # 可视化
+            writer.add_scalar('Train/Loss', train_loss, epoch)
+            writer.add_scalar('Train/Accuracy', train_accuracy, epoch)
+            writer.add_scalar('Validation/Loss', val_loss, epoch)
+            writer.add_scalar('Validation/Accuracy', val_accurate, epoch)
+
+            # 保存训练过程数据
             model_parameters(Train_Loss=Train_Loss, Train_Accuracy=Train_Accuracy,
                              Val_Loss=Val_Loss, Val_Accuracy=Val_Accuracy,
-                             save_dir=save_dir) # 保存训练过程数据
+                             save_dir=save_dir)
 
-    # 绘制损失率和准确率
+    # 绘图
     plot_loss(Train_Loss=Train_Loss, Val_Loss=Val_Loss, save_dir=save_dir)
     plot_accuracy(Train_Accuracy=Train_Accuracy, Val_Accuracy=Val_Accuracy, save_dir=save_dir)
-
-    # 绘制混淆矩阵和颜色条
-    plot_confusion_matrix(targets=targets, predictions=predictions,
-                          class_list=class_list, save_dir=save_dir)
-
-    # 绘制F1图
-    plot_f1_scores(targets=targets, predictions=predictions,
-                   class_list=class_list, save_dir=save_dir)
+    plot_evaluation(targets=targets, predictions=predictions,class_list=class_list, save_dir=save_dir)
 
     # 结束时间
     end_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
@@ -241,6 +246,8 @@ def main(opt):
     opt_yaml(opt=opt, type=type, num_classes=num_classes, steps=steps,
              config=config, start_time=start_time, end_time=end_time,
              save_dir=save_dir)
+
+    writer.close()
 
     print('Finished Training')
 

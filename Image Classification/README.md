@@ -4,6 +4,7 @@
 ## 更新日志
 **2023.6.6**
 * 新增DenseNet模型
+* 添加tensorboard可视化
 
 **2023.6.5**
 * 新增AlexNet模型
