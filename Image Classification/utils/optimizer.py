@@ -4,6 +4,7 @@ import torch.optim.lr_scheduler as lr_scheduler
 
 optimizer_dict = {
     'SGD': optim.SGD,
+    'SGDM': optim.SGD,
     'RMSprop': optim.RMSprop,
     'Adagrad': optim.Adagrad,
     'Adam': optim.Adam,
@@ -51,6 +52,11 @@ def optimizer(optimizer_name, lr_name, step, config, model_parameters):
 
         else:
             raise ValueError("Invalid learning_rate name: {}".format(lr_name))
+
+        # 添加动量参数
+        if optimizer_name == 'SGD':
+            momentum = config.get('momentum')
+            optimizer.momentum = momentum
 
         return optimizer, scheduler
     else:

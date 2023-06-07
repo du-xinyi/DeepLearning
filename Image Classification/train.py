@@ -22,7 +22,7 @@ if str(ROOT) not in sys.path:
     sys.path.append(str(ROOT))
 ROOT = Path(os.path.relpath(ROOT, Path.cwd()))
 
-optimizer_list = ['SGD', 'RMSprop', 'Adagrad', 'Adam', 'AdamW'] # 优化器列表
+optimizer_list = ['SGD', 'SGDM', 'RMSprop', 'Adagrad', 'Adam', 'AdamW'] # 优化器列表
 lr_list = ['Fixed', 'Cosine', 'Decay', 'Exponential'] # 学习率列表
 loss_list = ['CrossEntropyLoss', 'BCELoss', 'BCEWithLogitsLoss', 'NLLLoss'] # 损失函数列表
 model_list = [

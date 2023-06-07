@@ -48,8 +48,8 @@
 --epochs: 训练-验证集模式的迭代次数，默认为30
 --k: K折交叉验证模式的K值，默认为10
 --batch_size: 每个批次中包含的样本数量，默认为16
---optimizer: 优化器，可选['SGD', 'RMSprop', 'Adagrad', 'Adam', 'AdamW']，默认为Adam
---lr: 学习率，可选['Fixed', 'Cosine']，默认为Fixed，具体数值在根目录下config.yaml中
+--optimizer: 优化器，可选['SGD', 'SGDM', 'RMSprop', 'Adagrad', 'Adam', 'AdamW']，默认为Adam
+--lr: 学习率，可选['Fixed', 'Cosine', 'Decay', 'Exponential']，默认为Fixed，具体数值在根目录下config.yaml中
 --loss: 损失函数，可选['CrossEntropyLoss', 'BCELoss', 'BCEWithLogitsLoss', 'NLLLoss']，默认为CrossEntropyLoss
 --num_workers: 数据载入线程数量，默认为cpu核心数和8之间最小值
 --model: 网络类型，可选
