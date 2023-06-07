@@ -24,7 +24,7 @@ ROOT = Path(os.path.relpath(ROOT, Path.cwd()))
 
 optimizer_list = ['SGD', 'Adam', 'RMSprop'] # 优化器列表
 lr_list = ['Fixed', 'Cosine'] # 学习率列表
-loss_list = ['CrossEntropyLoss', 'NLLLoss', 'BCEWithLogitsLoss', 'BCELoss'] # 损失函数列表
+loss_list = ['CrossEntropyLoss', 'BCELoss', 'BCEWithLogitsLoss', 'NLLLoss'] # 损失函数列表
 model_list = [
     'alexnet',
     'densenet121', 'densenet161', 'densenet169', 'densenet201',

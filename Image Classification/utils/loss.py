@@ -2,9 +2,9 @@ import torch.nn as nn
 
 loss_dict = {
     'CrossEntropyLoss': nn.CrossEntropyLoss,
-    'NLLLoss': nn.NLLLoss,
+    'BCELoss': nn.BCELoss,
     'BCEWithLogitsLoss': nn.BCEWithLogitsLoss,
-    'BCELoss': nn.BCELoss
+    'NLLLoss': nn.NLLLoss
 }
 
 def select_loss(loss_name):
