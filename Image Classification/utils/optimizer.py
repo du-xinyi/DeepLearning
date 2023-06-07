@@ -54,7 +54,7 @@ def optimizer(optimizer_name, lr_name, step, config, model_parameters):
             raise ValueError("Invalid learning_rate name: {}".format(lr_name))
 
         # 添加动量参数
-        if optimizer_name == 'SGD':
+        if optimizer_name == 'SGDM':
             momentum = config.get('momentum')
             optimizer.momentum = momentum
 

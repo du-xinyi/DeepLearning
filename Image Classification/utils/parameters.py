@@ -19,8 +19,12 @@ def opt_yaml(opt, type, num_classes, steps, config, start_time, end_time, save_d
                             'model': opt_dict['model'],
                             'lr': {
                                 opt_dict['lr']: config['learning rate'][opt_dict['lr']]
-                            },
-                            'device': opt_dict['device'],
+                            }})
+
+    if opt_dict['optimizer'] == 'SGDM':
+        selected_params.update({'momentum': config['momentum']})
+
+    selected_params.update({'device': opt_dict['device'],
                             'start_time': start_time,
                             'end_time': end_time})
 
