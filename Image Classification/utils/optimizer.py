@@ -4,8 +4,10 @@ import torch.optim.lr_scheduler as lr_scheduler
 
 optimizer_dict = {
     'SGD': optim.SGD,
+    'RMSprop': optim.RMSprop,
+    'Adagrad': optim.Adagrad,
     'Adam': optim.Adam,
-    'RMSprop': optim.RMSprop
+    'AdamW': optim.AdamW
 }
 
 def optimizer(optimizer_name, lr_name, step, config, model_parameters):
