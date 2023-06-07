@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 
 
+# 自定义卷积层
 class BasicConv2d(nn.Module):
     def __init__(self, in_planes, places):
         super().__init__()
@@ -16,7 +17,7 @@ class BasicConv2d(nn.Module):
     def forward(self, x):
         return self.conv(x)
 
-
+# 密集连接层
 class _DenseLayer(nn.Module):
     def __init__(self, input_features, growth_rate, bn_size, drop_rate=0):
         super(_DenseLayer, self).__init__()
@@ -41,6 +42,7 @@ class _DenseLayer(nn.Module):
         return torch.cat([x, y], 1)
 
 
+# Dense块
 class DenseBlock(nn.Module):
     def __init__(self, num_layers, input_features, growth_rate, bn_size, drop_rate=0):
         super(DenseBlock, self).__init__()
@@ -54,6 +56,7 @@ class DenseBlock(nn.Module):
         return self.layers(x)
 
 
+# 转换层模块
 class _TransitionLayer(nn.Module):
     def __init__(self, input_features, output_features):
         super(_TransitionLayer, self).__init__()
