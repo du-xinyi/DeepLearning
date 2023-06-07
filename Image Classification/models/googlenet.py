@@ -3,6 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
+# 自定义卷积层
 class BasicConv2d(nn.Module):
     def __init__(self, in_channels, out_channels,  **kwargs):
         super().__init__()
@@ -24,22 +25,22 @@ class Inception1(nn.Module):
         if conv_block is None:
             conv_block = BasicConv2d
 
-        self.branch1 = conv_block(in_channels, ch1x1, kernel_size=1)
+        self.branch1 = conv_block(in_channels, ch1x1, kernel_size=1) # 引入一个具有较小输出通道数的卷积操作，捕捉输入的低级特征
 
         self.branch2 = nn.Sequential(
             conv_block(in_channels, ch3x3red, kernel_size=1),
             conv_block(ch3x3red, ch3x3, kernel_size=3, padding=1)
-        )
+        ) # 通过较小的卷积核进行多层卷积操作，捕获不同尺度的特征
 
         self.branch3 = nn.Sequential(
             conv_block(in_channels, ch5x5red, kernel_size=1),
             conv_block(ch5x5red, ch5x5, kernel_size=3, padding=1),
-        )
+        ) # 引入一个具有较大感受野的卷积操作，捕获更广泛的上下文信息
 
         self.branch4 = nn.Sequential(
             nn.MaxPool2d(kernel_size=3, stride=1, padding=1, ceil_mode=True),
             conv_block(in_channels, pool_proj, kernel_size=1),
-        )
+        ) # 通过池化和卷积操作来减少特征图的空间分辨率，同时保留通道信息
 
     def forward(self, x):
         branch1 = self.branch1(x)
@@ -52,6 +53,7 @@ class Inception1(nn.Module):
         return torch.cat(outputs, 1)
 
 
+# 辅助分类器
 class InceptionAux(nn.Module):
     def __init__(self, in_channels, num_classes, conv_block=None):
         super().__init__()
