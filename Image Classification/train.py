@@ -57,7 +57,7 @@ def parse_opt(known=False):
     parser.add_argument('--loss', type=str, choices=loss_list, default='CrossEntropyLoss', help='loss function')
     parser.add_argument('--num_workers', type=int, default=min([os.cpu_count(), 8]),
                         help='number of worker threads for loading data')
-    parser.add_argument('--model', type=str, choices=model_list, default='alexnet',help='choose the network model')
+    parser.add_argument('--model', type=str, choices=model_list, default='resnet152',help='choose the network model')
     parser.add_argument('--weights', type=str, default='', help='initial weights path')
     parser.add_argument('--no_transfer_learning', action='store_false',
                         help='disable transfer learning')
