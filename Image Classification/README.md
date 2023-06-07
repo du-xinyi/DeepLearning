@@ -2,6 +2,9 @@
 
 
 ## 更新日志
+**2023.6.7**
+* 新增部分优化器及损失函数
+
 **2023.6.6**
 * 新增DenseNet模型
 * 添加tensorboard可视化
@@ -45,13 +48,16 @@
 --epochs: 训练-验证集模式的迭代次数，默认为30
 --k: K折交叉验证模式的K值，默认为10
 --batch_size: 每个批次中包含的样本数量，默认为16
---optimizer: 优化器，可选['SGD', 'Adam', 'RMSprop']，默认为Adam
+--optimizer: 优化器，可选['SGD', 'RMSprop', 'Adagrad', 'Adam', 'AdamW']，默认为Adam
 --lr: 学习率，可选['Fixed', 'Cosine']，默认为Fixed，具体数值在根目录下config.yaml中
---loss: 损失函数，可选['CrossEntropyLoss', 'NLLLoss', 'BCEWithLogitsLoss', 'BCELoss']，默认为CrossEntropyLoss
+--loss: 损失函数，可选['CrossEntropyLoss', 'BCELoss', 'BCEWithLogitsLoss', 'NLLLoss']，默认为CrossEntropyLoss
 --num_workers: 数据载入线程数量，默认为cpu核心数和8之间最小值
 --model: 网络类型，可选
-    ['resnet18','resnet34', 'resnet50', 'resnet101', 'resnet152',
-     'resnext50_32x4d', 'resnext101_32x8d', 'resnext101_32x16d']
+    ['alexnet',
+    'densenet121', 'densenet161', 'densenet169', 'densenet201',
+    'googlenet', 'inception_v3',
+    'resnet18','resnet34', 'resnet50', 'resnet101', 'resnet152',
+    'resnext50_32x4d', 'resnext101_32x8d', 'resnext101_64x4d']
 --weights: 预训练权重，默认不设置，自动选择为使用网络的预训练权重
 --no_transfer_learning: 是否使用迁移学习，默认为使用，调用则不使用迁移学习
 --device: 设备类型，在支持cuda时使用gpu，否则使用cpu
