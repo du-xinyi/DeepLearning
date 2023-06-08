@@ -21,6 +21,7 @@ def opt_yaml(opt, type, num_classes, steps, config, start_time, end_time, save_d
                                 opt_dict['lr']: config['learning rate'][opt_dict['lr']]
                             }})
 
+    # 优化器选择SGDM额外写入动量参数
     if opt_dict['optimizer'] == 'SGDM':
         selected_params.update({'momentum': config['momentum']})
 
