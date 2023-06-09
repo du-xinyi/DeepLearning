@@ -39,6 +39,7 @@ Val_Accuracy = [] # 验证过程的准确率
 
 predictions = [] # 预测结果
 targets = [] # 真实标签
+confidences = [] # 置信度
 
 counter = 1 # 计数器
 
@@ -50,14 +51,14 @@ def parse_opt(known=False):
     # 可选参数
     parser.add_argument('--datasets', type=str, default=ROOT / 'test', help='path to the data directory')
     parser.add_argument('--epochs', type=int, default=30, help='total training epochs')
-    parser.add_argument('--k', type=int, default=10, help='number of folds for k-fold cross validation')
+    parser.add_argument('--k', type=int, default=5, help='number of folds for k-fold cross validation')
     parser.add_argument('--batch_size', type=int, default=16, help='batch size for training and validation')
     parser.add_argument('--optimizer', type=str, choices=optimizer_list, default='Adam', help='optimizer')
     parser.add_argument('--lr', type=str, choices=lr_list, default='Fixed', help='learning rate')
     parser.add_argument('--loss', type=str, choices=loss_list, default='CrossEntropyLoss', help='loss function')
     parser.add_argument('--num_workers', type=int, default=min([os.cpu_count(), 8]),
                         help='number of worker threads for loading data')
-    parser.add_argument('--model', type=str, choices=model_list, default='resnet152',help='choose the network model')
+    parser.add_argument('--model', type=str, choices=model_list, default='resnet18',help='choose the network model')
     parser.add_argument('--weights', type=str, default='', help='initial weights path')
     parser.add_argument('--no_transfer_learning', action='store_false',
                         help='disable transfer learning')
@@ -204,14 +205,16 @@ def main(opt):
                 val_images, val_labels = val_data
                 outputs = model(val_images.to(opt.device))
                 loss = loss_function(outputs, val_labels.to(opt.device))
-                predict_y = torch.max(outputs, dim=1)[1]
+                probabilities = torch.nn.functional.softmax(outputs, dim=1)
+                confidence, predicted_labels = torch.max(probabilities, dim=1)
 
                 running_loss += loss.item()
-                val_acc += (predict_y == val_labels.to(opt.device)).sum().item()
+                val_acc += (predicted_labels == val_labels.to(opt.device)).sum().item()
 
-                # 保存预测结果和真实标签
-                predictions.extend(predict_y.tolist())
+                # 保存预测结果、真实标签和置信度
+                predictions.extend(predicted_labels.tolist())
                 targets.extend(val_labels.tolist())
+                confidences.extend(confidence.tolist())
             val_loss = running_loss / step # 验证集平均损失
             val_accurate = val_acc / val_num # 验证集准确率
 
@@ -243,7 +246,8 @@ def main(opt):
     # 绘图
     plot_evaluation(train_loss=Train_Loss, val_loss=Val_Loss,
                     train_accuracy=Train_Accuracy, val_accuracy=Val_Accuracy,
-                    targets=targets, predictions=predictions,class_list=class_list, save_dir=save_dir)
+                    targets=targets, predictions=predictions, confidences=confidences,
+                    class_list=class_list, save_dir=save_dir)
 
     # 结束时间
     end_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
