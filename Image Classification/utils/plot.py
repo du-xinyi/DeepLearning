@@ -132,16 +132,6 @@ def plot_pr_curve(targets, predictions, class_list, save_dir):
     plt.savefig(os.path.join(save_dir, 'PR_curve.jpg'), bbox_inches='tight')
     plt.show()
 
-    # 保存PR值
-    csv_file_path = os.path.join(save_dir, 'PR_values.csv')
-    with open(csv_file_path, mode='w', newline='') as file:
-        writer = csv.writer(file)
-        writer.writerow(['Class', 'Precision', 'Recall'])
-        for i, class_name in enumerate(class_list):
-            precision_str = ' '.join([str(precision) for precision in precisions[i]])
-            recall_str = ' '.join([str(recall) for recall in recalls[i]])
-            writer.writerow([class_name, precision_str, recall_str])
-
 
 def plot_roc_curve(targets, confidences, class_list, save_dir):
     fpr = dict()
@@ -185,15 +175,6 @@ def plot_roc_curve(targets, confidences, class_list, save_dir):
 
     plt.savefig(os.path.join(save_dir, 'ROC_curve.jpg'), bbox_inches='tight')
     plt.show()
-
-    csv_file_path = os.path.join(save_dir, 'ROC_values.csv')
-    with open(csv_file_path, mode='w', newline='') as file:
-        writer = csv.writer(file)
-        writer.writerow(['Class', 'False Positive Rate', 'True Positive Rate'])
-        for i, class_name in enumerate(class_list):
-            fpr_str = ' '.join([str(fpr_val) for fpr_val in fpr[i]])
-            tpr_str = ' '.join([str(tpr_val) for tpr_val in tpr[i]])
-            writer.writerow([class_name, fpr_str, tpr_str])
 
 
 def plot_f1(targets, predictions, class_list, save_dir):
