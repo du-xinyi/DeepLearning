@@ -19,7 +19,8 @@ def plot_loss(train_loss, val_loss, save_dir):
     plt.legend()
 
     plt.savefig(os.path.join(save_dir, 'loss.jpg'), bbox_inches='tight')
-    plt.show()
+    # plt.show()
+    plt.clf()
 
 
 # 绘制accuracy曲线
@@ -32,7 +33,8 @@ def plot_accuracy(train_accuracy, val_accuracy, save_dir):
     plt.legend()
 
     plt.savefig(os.path.join(save_dir, 'accuracy.jpg'), bbox_inches='tight')
-    plt.show()
+    # plt.show()
+    plt.clf()
 
 
 def plot_confusion_matrix(class_list, targets, predictions, save_dir):
@@ -65,7 +67,8 @@ def plot_confusion_matrix(class_list, targets, predictions, save_dir):
     cbar.set_ticklabels(np.arange(min_value, max_value + 1, step_size))
 
     plt.savefig(os.path.join(save_dir, 'confusion_matrix.png'), bbox_inches='tight')
-    plt.show()
+    # plt.show()
+    plt.clf()
 
 
 # PR曲线
@@ -130,7 +133,8 @@ def plot_pr_curve(targets, predictions, class_list, save_dir):
     plt.ylim([0.0, 1.0])
 
     plt.savefig(os.path.join(save_dir, 'PR_curve.jpg'), bbox_inches='tight')
-    plt.show()
+    # plt.show()
+    plt.clf()
 
 
 def plot_roc_curve(targets, confidences, class_list, save_dir):
@@ -174,29 +178,33 @@ def plot_roc_curve(targets, confidences, class_list, save_dir):
     plt.ylim([0.0, 1.0])
 
     plt.savefig(os.path.join(save_dir, 'ROC_curve.jpg'), bbox_inches='tight')
-    plt.show()
+    # plt.show()
+    plt.clf()
 
 
 def plot_f1(targets, predictions, class_list, save_dir):
-    num_classes = len(class_list)
-
     f1_scores = dict()
 
-    for i in range(num_classes):
+    for i in range(len(class_list)):
         true_class = np.array(targets) == i
         pred_class = np.array(predictions) == i
         f1_scores[i] = f1_score(true_class, pred_class)
 
+    # 提取类别和F1值
+    f1_list = list(f1_scores.keys())
+    f1_values = list(f1_scores.values())
+
     # 柱状图
-    plt.bar(np.arange(num_classes) + 0.5, f1_scores)
+    plt.bar(f1_list, f1_values)
     plt.xlabel('Class')
     plt.ylabel('F1 Score')
     plt.title('F1 Score for Each Class')
-    plt.xticks(np.arange(num_classes) + 0.5, range(num_classes), rotation=45, ha='right')  # 横坐标设置在柱状图中间
+    plt.xticks(np.arange(len(f1_list)), f1_list, rotation=45, ha='right')  # 横坐标设置在柱状图中间
     plt.grid(True)
 
     plt.savefig(os.path.join(save_dir, 'F1_Score.jpg'), bbox_inches='tight')
-    plt.show()
+    # plt.show()
+    plt.clf()
 
     # 保存F1值
     with open(os.path.join(save_dir, 'F1_scores.csv'), 'w', newline='') as csvfile:

@@ -49,7 +49,7 @@ def parse_opt(known=False):
     parser = argparse.ArgumentParser()
 
     # 可选参数
-    parser.add_argument('--datasets', type=str, default=ROOT / 'datasets', help='path to the data directory')
+    parser.add_argument('--datasets', type=str, default=ROOT / 'test', help='path to the data directory')
     parser.add_argument('--epochs', type=int, default=30, help='total training epochs')
     parser.add_argument('--k', type=int, default=5, help='number of folds for k-fold cross validation')
     parser.add_argument('--batch_size', type=int, default=16, help='batch size for training and validation')
