@@ -71,11 +71,11 @@ def main(opt):
 
     os.makedirs(save_dir)
 
-    class_num = data.get('num_classes') # 类别数量
+    classes_num = data.get('num_classes') # 类别数量
     model_name = data.get('model') # 网络名称
 
     # 载入模型
-    model = net(number=class_num, model=model_name)
+    model = net(number=classes_num, model=model_name)
     model_weight_path = opt.weights
     model.load_state_dict(torch.load(model_weight_path, map_location=opt.device))
 
@@ -109,7 +109,7 @@ def main(opt):
     # 保存参数
     with open(os.path.join(save_dir, 'cfg.yaml'), 'w') as file:
         selected_params = {}
-        selected_params['class_num'] = class_num
+        selected_params['classes_num'] = classes_num
         selected_params['model_name'] = model_name
 
         yaml.dump(selected_params, file, sort_keys=False)
