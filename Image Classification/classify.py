@@ -91,7 +91,7 @@ def main(opt):
             predict_cla = torch.argmax(predict).numpy() # 寻找最大值对应的索引
 
             # 保存图片
-            save_path = os.path.join(os.path.join(save_dir, 'source'), class_indict[str(predict_cla)])
+            save_path = os.path.join(save_dir, class_indict[str(predict_cla)])
             if not os.path.exists(save_path):
                 os.makedirs(save_path)
 
