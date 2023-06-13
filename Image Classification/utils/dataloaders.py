@@ -188,6 +188,6 @@ class ImageTransform:
                     image = self.transform(file_path, model)
                     images.append(image)
                     names.append(file_name)
-                    paths.append(source)
+                    paths.append(file_path)
 
         return images, names, paths
