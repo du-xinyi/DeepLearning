@@ -7,6 +7,7 @@ import json
 import shutil
 
 from pathlib import Path
+from tqdm import tqdm
 from utils.model import net
 from utils.dataloaders import ImageTransform
 
@@ -85,7 +86,7 @@ def main(opt):
     model.eval() # 评估模式
 
     with torch.no_grad():
-        for image, name, path in zip(images, names, paths):
+        for image, name, path in tqdm(zip(images, names, paths), total=len(images), desc='Copying Images'):
             output = torch.squeeze(model(image))
             predict = torch.softmax(output, dim=0)
             predict_cla = torch.argmax(predict).numpy() # 寻找最大值对应的索引
