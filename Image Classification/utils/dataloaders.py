@@ -176,10 +176,18 @@ class ImageTransform:
             file_names = os.listdir(source)
             for file_name in file_names:
                 file_path = os.path.join(source, file_name)
+                if os.path.isdir(file_path):
+                    for file_name in os.listdir(file_path):
+                        label_path = os.path.join(file_path, file_name)
+                        if os.path.isfile(os.path.join(file_path, file_name)):
+                            image = self.transform(label_path, model)
+                            images.append(image)
+                            names.append(file_name)
+                            paths.append(file_path)
                 if os.path.isfile(file_path):
                     image = self.transform(file_path, model)
                     images.append(image)
-                    names.append(os.path.basename(file_path))
-                    paths.append(file_path)
+                    names.append(file_name)
+                    paths.append(source)
 
         return images, names, paths

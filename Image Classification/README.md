@@ -2,7 +2,10 @@
 
 
 ## 更新日志
-**2023.6.22**
+**2023.6.13**
+* detect.py支持文件夹检测，真实值标签设置为文件夹名称，单张图片检测真实值为图片名称
+
+**2023.6.12**
 * 添加ROC曲线
 
 **2023.6.9**
@@ -87,6 +90,20 @@
 --project: 检测完保存路径，默认为根目录下runs/detect文件夹中
 --name: 保存文件夹名称，默认为exp
 ```
+
+#### <pre>classify.py</pre>
+分类程序
+可选参数：
+```
+--weights: 检测所用的模型
+--source: 所要检测的图片或者文件夹
+--data: 训练时的参数，默认为所指定weights的上一级目录的cfg.yaml文件
+--indices: 类别标签，默认为所指定weights的上一级目录的class_indices.json文件
+--device: 设备类型，在支持cuda时使用gpu，否则使用cpu
+--project: 检测完保存路径，默认为根目录下runs/classify文件夹中
+--name: 保存文件夹名称，默认为exp
+```
+
 #### <pre>config.yaml</pre>
 有关训练的相关参数
 #### <pre>models</pre>

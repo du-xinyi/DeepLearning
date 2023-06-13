@@ -5,7 +5,7 @@ import os
 import yaml
 import json
 import csv
-import shutil
+import numpy as np
 
 from pathlib import Path
 from utils.model import net
@@ -17,6 +17,9 @@ ROOT = FILE.parents[0]
 if str(ROOT) not in sys.path:
     sys.path.append(str(ROOT))
 ROOT = Path(os.path.relpath(ROOT, Path.cwd()))
+
+class_totals = {} # 存储每个类别的总预测数
+class_corrects = {} # 存储每个类别的正确预测数
 
 # 命令行参数
 def parse_opt(known=False):
@@ -87,24 +90,53 @@ def main(opt):
     # 保存结果
     with open(os.path.join(save_dir, 'predictions.csv'), 'w', newline='') as file:
         writer = csv.writer(file)
-        writer.writerow(['Image', 'Class', 'Probability'])
+        writer.writerow(['Image', 'True_Class', 'Predicted_Class', 'Probability'])
 
         with torch.no_grad():
             for image, name, path in zip(images, names, paths):
+                print(name)
                 output = torch.squeeze(model(image))
                 predict = torch.softmax(output, dim=0)
                 predict_cla = torch.argmax(predict).numpy() # 寻找最大值对应的索引
-                print(name, class_indict[str(predict_cla)], predict[predict_cla].numpy())
+                predicted_class = class_indict[str(predict_cla)]
+                probability = predict[predict_cla].numpy()
+
+                if path != opt.source:
+                    true_class = path.split('/')[-1] # 获取path的最后一段作为真实类别标签
+                else:
+                    true_class = name
+
+                print(name, true_class, predicted_class, probability)
 
                 # 写入结果
-                writer.writerow([name, class_indict[str(predict_cla)], predict[predict_cla].numpy()])
+                writer.writerow([name, true_class, predicted_class, probability])
 
-                # 保存图片
-                save_path = os.path.join(os.path.join(save_dir, 'source'), class_indict[str(predict_cla)])
-                if not os.path.exists(save_path):
-                    os.makedirs(save_path)
+                # 更新类别的总预测数和正确预测数
+                if predicted_class not in class_totals:
+                    class_totals[predicted_class] = 0
+                    class_corrects[predicted_class] = 0
 
-                shutil.copyfile(path, os.path.join(save_path, name))
+                class_totals[predicted_class] += 1
+                if predicted_class == true_class:
+                    class_corrects[predicted_class] += 1
+
+    # 计算每个类别的平均准确率
+    class_accuracies = {}
+    for class_name in class_totals:
+        class_accuracies[class_name] = class_corrects[class_name] / class_totals[class_name]
+        print(class_name, class_accuracies)
+
+    # 计算总体平均准确率
+    overall_accuracy = np.mean(list(class_accuracies.values()))
+    print('Overall_Accuracy', overall_accuracy)
+
+    # 保存结果
+    with open(os.path.join(save_dir, 'result.csv'), 'w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(['Class', 'Accuracy'])
+        for class_name, accuracy in class_accuracies.items():
+            writer.writerow([class_name, accuracy])
+        writer.writerow(['Overall Accuracy', overall_accuracy])
 
     # 保存参数
     with open(os.path.join(save_dir, 'cfg.yaml'), 'w') as file:
