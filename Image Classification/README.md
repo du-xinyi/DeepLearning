@@ -2,6 +2,9 @@
 
 
 ## 更新日志
+**2023.6.19**
+* 重构models/resnet.py，将models/resnet.py和models/resnext.py合并，并添加wide_resnet
+
 **2023.6.13**
 * detect.py支持文件夹检测，真实值标签设置为文件夹名称，单张图片检测真实值为图片名称
 
@@ -66,7 +69,8 @@
     'densenet121', 'densenet161', 'densenet169', 'densenet201',
     'googlenet', 'inception_v3',
     'resnet18','resnet34', 'resnet50', 'resnet101', 'resnet152',
-    'resnext50_32x4d', 'resnext101_32x8d', 'resnext101_64x4d']
+    'resnext50_32x4d', 'resnext101_32x8d', 'resnext101_64x4d',
+    'wide_resnet50_2', 'wide_resnet101_2']
 --weights: 预训练权重，默认不设置，自动选择为使用网络的预训练权重
 --no_transfer_learning: 是否使用迁移学习，默认为使用，调用则不使用迁移学习
 --device: 设备类型，在支持cuda时使用gpu，否则使用cpu
