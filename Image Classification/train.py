@@ -30,7 +30,8 @@ model_list = [
     'densenet121', 'densenet161', 'densenet169', 'densenet201',
     'googlenet', 'inception_v3',
     'resnet18','resnet34', 'resnet50', 'resnet101', 'resnet152',
-    'resnext50_32x4d', 'resnext101_32x8d', 'resnext101_64x4d'] # 模型列表
+    'resnext50_32x4d', 'resnext101_32x8d', 'resnext101_64x4d',
+    'wide_resnet50_2', 'wide_resnet101_2'] # 模型列表
 
 Train_Loss = [] # 训练过程的损失率
 Train_Accuracy = [] # 训练过程的准确率
@@ -58,7 +59,7 @@ def parse_opt(known=False):
     parser.add_argument('--loss', type=str, choices=loss_list, default='CrossEntropyLoss', help='loss function')
     parser.add_argument('--num_workers', type=int, default=min([os.cpu_count(), 8]),
                         help='number of worker threads for loading data')
-    parser.add_argument('--model', type=str, choices=model_list, default='resnet18',help='choose the network model')
+    parser.add_argument('--model', type=str, choices=model_list, default='resnet152',help='choose the network model')
     parser.add_argument('--weights', type=str, default='', help='initial weights path')
     parser.add_argument('--no_transfer_learning', action='store_false',
                         help='disable transfer learning')
