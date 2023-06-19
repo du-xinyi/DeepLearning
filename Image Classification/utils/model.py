@@ -7,8 +7,9 @@ from models.alexnet import alexnet
 from models.densenet import densenet121, densenet161, densenet169, densenet201
 from models.googlenet import googlenet
 from models.inception import inception_v3
-from models.resnet import resnet18, resnet34, resnet50, resnet101, resnet152
-from models.resnext import resnext50_32x4d, resnext101_32x8d, resnext101_64x4d
+from models.resnet import resnet18, resnet34, resnet50, resnet101, resnet152, \
+    resnext50_32x4d, resnext101_32x8d, resnext101_64x4d, \
+    wide_resnet50_2, wide_resnet101_2
 
 
 # 模型名称
@@ -27,7 +28,9 @@ model_list = {
     'resnet152': resnet152,
     'resnext50_32x4d': resnext50_32x4d,
     'resnext101_32x8d': resnext101_32x8d,
-    'resnext101_64x4d': resnext101_64x4d
+    'resnext101_64x4d': resnext101_64x4d,
+    'wide_resnet50_2': wide_resnet50_2,
+    'wide_resnet101_2': wide_resnet101_2
 }
 
 # 无训练权重的模型
@@ -55,7 +58,11 @@ model_urls = {
     'resnext50_32x4d': 'https://download.pytorch.org/models/resnext50_32x4d-1a0047aa.pth', # IMAGENET1K_V2
     # 'resnext101_32x8d': 'https://download.pytorch.org/models/resnext101_32x8d-8ba56ff5.pth', # IMAGENET1K_V1
     'resnext101_32x8d': 'https://download.pytorch.org/models/resnext101_32x8d-110c445d.pth', # IMAGENET1K_V2
-    'resnext101_64x4d': 'https://download.pytorch.org/models/resnext101_64x4d-173b62eb.pth' # IMAGENET1K_V1
+    'resnext101_64x4d': 'https://download.pytorch.org/models/resnext101_64x4d-173b62eb.pth', # IMAGENET1K_V1
+    # 'wide_resnet50_2': "https://download.pytorch.org/models/wide_resnet50_2-95faca4d.pth", # IMAGENET1K_V1
+    'wide_resnet50_2': "https://download.pytorch.org/models/wide_resnet50_2-9ba9bcbe.pth", # IMAGENET1K_V2
+    # 'wide_resnet101_2': "https://download.pytorch.org/models/wide_resnet101_2-32ee1156.pth", # IMAGENET1K_V1
+    'wide_resnet101_2': "https://download.pytorch.org/models/wide_resnet101_2-d733dc28.pth" # IMAGENET1K_V2
 }
 
 # 下载预训练权重
